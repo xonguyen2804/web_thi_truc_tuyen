@@ -1,0 +1,6 @@
+body { font-family: Arial, sans-serif; margin: 0; background: #f5f7fa; color: #20242a; }
+.container { max-width: 420px; margin: 8vh auto; padding: 2rem; background: #fff; border-radius: 10px; box-shadow: 0 4px 18px #00000012; }
+form { display: grid; gap: .75rem; }
+input, button { padding: .7rem; font: inherit; }
+button { cursor: pointer; }
+.error { color: #b42318; }
