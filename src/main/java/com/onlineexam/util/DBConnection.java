@@ -4,27 +4,28 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-/**
- * SQL Server connection helper.
- *
- * Set these environment variables before running:
- * ONLINEEXAM_DB_URL, ONLINEEXAM_DB_USER, ONLINEEXAM_DB_PASSWORD
- * Do not commit real credentials to GitHub.
- */
 public final class DBConnection {
+
     private DBConnection() {
     }
 
-    public static Connection getConnection() throws SQLException {
-        String url = System.getenv("ONLINEEXAM_DB_URL");
-        String user = System.getenv("ONLINEEXAM_DB_USER");
-        String password = System.getenv("ONLINEEXAM_DB_PASSWORD");
+    private static final String URL = "jdbc:mysql://localhost:3307/onlineexam";
 
-        if (url == null || user == null || password == null) {
+    private static final String USER = "root";
+    private static final String PASSWORD = "";
+
+    public static Connection getConnection() throws SQLException {
+
+        try {
+            // Nạp MySQL JDBC Driver
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+        } catch (ClassNotFoundException e) {
             throw new SQLException(
-                    "Database settings are missing. Set ONLINEEXAM_DB_URL, ONLINEEXAM_DB_USER, ONLINEEXAM_DB_PASSWORD.");
+                    "Khong tim thay MySQL JDBC Driver", e);
         }
 
-        return DriverManager.getConnection(url, user, password);
+        return DriverManager.getConnection(
+                URL, USER, PASSWORD);
     }
 }

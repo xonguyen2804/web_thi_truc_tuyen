@@ -9,7 +9,7 @@
 <body>
 <main class="container">
     <h1>Đăng nhập OnlineExam</h1>
-    <form method="post" action="${pageContext.request.contextPath}/auth">
+    <form method="post" action="${pageContext.request.contextPath}/auth/login">
         <label for="username">Tên đăng nhập</label>
         <input id="username" name="username" type="text" autocomplete="username" required>
 

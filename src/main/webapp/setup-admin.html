@@ -1,0 +1,189 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Tạo ADMIN - OnlineExam</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 35px;
+            border-radius: 12px;
+            width: 400px;
+            max-width: 95%;
+            box-shadow: 0 4px 20px #00000015;
+        }
+
+        h2 {
+            text-align: center;
+            color: #1e293b;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 25px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        #message {
+            margin-top: 15px;
+            text-align: center;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>Tạo tài khoản ADMIN</h2>
+
+    <form id="adminForm">
+
+        <label>Username</label>
+        <input type="text"
+               name="username"
+               required>
+
+        <label>Full Name</label>
+        <input type="text"
+               name="fullName"
+               required>
+
+        <label>Email</label>
+        <input type="email"
+               name="email"
+               required>
+
+        <label>Password</label>
+        <input type="password"
+               name="password"
+               minlength="12"
+               required>
+
+        <label>Setup Token</label>
+        <input type="password"
+               id="setupToken"
+               required>
+
+        <button type="submit" id="submitBtn">
+            Tạo tài khoản ADMIN
+        </button>
+
+    </form>
+
+    <p id="message" role="status"></p>
+
+</div>
+
+<script>
+    const form = document.getElementById("adminForm");
+    const message = document.getElementById("message");
+    const button = document.getElementById("submitBtn");
+
+    form.addEventListener("submit", async function(event) {
+
+        event.preventDefault();
+
+        button.disabled = true;
+        message.textContent = "Đang tạo tài khoản...";
+
+        const formData = new FormData(form);
+
+        const params = new URLSearchParams();
+
+        params.set("username", formData.get("username"));
+        params.set("fullName", formData.get("fullName"));
+        params.set("email", formData.get("email"));
+        params.set("password", formData.get("password"));
+
+        const token =
+            document.getElementById("setupToken").value;
+
+        try {
+            const response = await fetch("setup-admin", {
+                method: "POST",
+                headers: {
+                    "Content-Type":
+                        "application/x-www-form-urlencoded",
+                    "X-Setup-Token": token
+                },
+                body: params.toString()
+            });
+
+            if (response.ok) {
+                message.style.color = "green";
+                message.textContent =
+                    "Tạo tài khoản ADMIN thành công!";
+
+                form.reset();
+
+            } else {
+                message.style.color = "red";
+                message.textContent =
+                    "Tạo tài khoản thất bại. HTTP "
+                    + response.status;
+            }
+
+        } catch (error) {
+            message.style.color = "red";
+            message.textContent =
+                "Không thể kết nối tới Server.";
+        } finally {
+            button.disabled = false;
+        }
+    });
+</script>
+
+</body>
+</html>
