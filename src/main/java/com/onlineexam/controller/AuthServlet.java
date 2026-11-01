@@ -46,7 +46,7 @@ public class AuthServlet extends HttpServlet {
         try {
             // Bước 1: Xác thực tài khoản
             User user = authService.login(username, password);
-            System.out.println("test");
+
             if (user == null) {
                 request.setAttribute(
                         "error",
@@ -57,7 +57,7 @@ public class AuthServlet extends HttpServlet {
 
                 return;
             }
-            System.out.println("user tồn tại");
+
             // Bước 2: Kiểm tra quyền
             Role role = user.getRole();
 
@@ -79,11 +79,11 @@ public class AuthServlet extends HttpServlet {
                     break;
 
                 case "TEACHER":
-                    destination = "/teacher";
+                    destination = "/teacher/home";
                     break;
 
                 case "STUDENT":
-                    destination = "/student";
+                    destination = "/student/home";
                     break;
 
                 default:
@@ -103,9 +103,9 @@ public class AuthServlet extends HttpServlet {
             session = request.getSession(true);
 
             session.setAttribute("userId", user.getUserId());
-            session.setAttribute("username", user.getUsername());
+            session.setAttribute("userName", user.getUsername());
             session.setAttribute("role", roleName);
-
+            session.setAttribute("fullName", user.getFullName());
             // Hết hạn sau 30 phút không hoạt động
             session.setMaxInactiveInterval(30 * 60);
 

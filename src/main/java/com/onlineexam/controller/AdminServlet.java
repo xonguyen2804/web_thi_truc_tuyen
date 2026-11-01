@@ -18,7 +18,6 @@ public class AdminServlet extends HttpServlet {
             HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
-        System.out.println("test1111");
 
         HttpSession session = request.getSession(false);
 

@@ -47,11 +47,11 @@ public class HomeServlet extends HttpServlet {
                 break;
 
             case "TEACHER":
-                response.sendRedirect(contextPath + "/teacher");
+                response.sendRedirect(contextPath + "/teacher/dashboard");
                 break;
 
             case "STUDENT":
-                response.sendRedirect(contextPath + "/student");
+                response.sendRedirect(contextPath + "/student/dashboard");
                 break;
 
             default:
