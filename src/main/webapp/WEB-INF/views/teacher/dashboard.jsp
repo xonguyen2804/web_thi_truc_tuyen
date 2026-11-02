@@ -32,15 +32,10 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tổng Quan Giáo Viên | Hệ Thống Thi Thử Online</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/teacher.css">
-    <meta charset="UTF-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tổng Quan Giáo Viên | Hệ Thống Thi Thử Online</title>
-    <!-- CSS chung của giáo viên -->
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/teacher.css">
-    <!-- CSS riêng cho Dashboard vừa tách -->
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/teacher-dashboard.css">
+    <link rel="stylesheet"
+      href="${pageContext.request.contextPath}/assets/css/teacher.css?v=10">
+    <link rel="stylesheet"
+      href="${pageContext.request.contextPath}/assets/css/teacher-dashboard.css?v=10">
 </head>
 <body>
 <div class="teacher-layout">
@@ -129,10 +124,6 @@
             <h2 style="font-size: 20px; font-weight: 700; margin: 0 0 6px 0;">
                 Xin chào Quý Thầy/Cô!
             </h2>
-            <p style="margin: 0; color: #e0e7ff; font-size: 13px; line-height: 1.5; max-width: 650px;">
-                Thầy/Cô có thể tạo đề thi theo cấu trúc chuẩn, mở các đợt thi thử cho lớp học,
-                và hệ thống sẽ tự động chấm điểm trắc nghiệm cũng như thống kê kết quả bài làm của học sinh.
-            </p>
         </section>
 
         <!-- Thẻ Thống Kê Số Liệu Thật Từ Database -->

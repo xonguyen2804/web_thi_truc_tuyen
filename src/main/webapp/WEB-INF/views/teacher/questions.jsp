@@ -28,33 +28,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ngân Hàng Câu Hỏi | OnlineExam</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/teacher.css">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ngân Hàng Câu Hỏi | OnlineExam</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/teacher.css">
+    <title>Ngân hàng câu hỏi | OnlineExam</title>
+    <link rel="stylesheet"
+          href="${pageContext.request.contextPath}/assets/css/teacher.css?v=4">
 </head>
 <body>
 <div class="teacher-layout">
     <!-- Sidebar -->
     <aside class="sidebar">
-        <a class="brand" href="${pageContext.request.contextPath}/teacher/dashboard" style="display: flex; align-items: center; gap: 10px; margin-bottom: 28px;">
-            <div style="background: #2563eb; color: white; width: 36px; height: 36px; border-radius: 8px; display: grid; place-items: center; font-weight: 800;">OE</div>
-            <div>
-                <span style="font-size: 16px; font-weight: 800; color: #1e3a8a; display: block;">OnlineExam</span>
-                <span style="font-size: 11px; color: #64748b;">Luyện Thi THPT QG</span>
+        <a class="brand" href="${pageContext.request.contextPath}/teacher/dashboard">
+            <div class="brand-logo">OE</div>
+            <div class="brand-info">
+                <span class="brand-name">OnlineExam</span>
+                <span class="brand-subtitle">Cổng thông tin giáo viên</span>
             </div>
         </a>
-        <div class="sidebar-label">CHỨC NĂNG GIẢNG DẠY</div>
+
+        <div class="sidebar-label">QUẢN LÝ GIẢNG DẠY</div>
+
         <nav class="sidebar-nav">
-            <a class="nav-item" href="${pageContext.request.contextPath}/teacher/dashboard">📊 Tổng Quan</a>
-            <a class="nav-item" href="${pageContext.request.contextPath}/teacher/exams">📝 Quản Lý Đề Thi</a>
-            <a class="nav-item active" href="${pageContext.request.contextPath}/teacher/questions">❓ Ngân Hàng Câu Hỏi</a>
-            <a class="nav-item" href="${pageContext.request.contextPath}/teacher/classes">👥 Lớp Học</a>
-            <a class="nav-item" href="${pageContext.request.contextPath}/teacher/exam-sessions">⏱ Lịch Thi</a>
+            <a class="nav-item"
+            href="${pageContext.request.contextPath}/teacher/dashboard">
+                <span>📊</span> Tổng quan
+            </a>
+
+            <a class="nav-item"
+            href="${pageContext.request.contextPath}/teacher/exams">
+                <span>📝</span> Quản lý đề thi
+            </a>
+
+            <a class="nav-item active"
+            href="${pageContext.request.contextPath}/teacher/questions">
+                <span>❓</span> Ngân hàng câu hỏi
+            </a>
+
+            <a class="nav-item"
+            href="${pageContext.request.contextPath}/teacher/classes">
+                <span>👥</span> Lớp học và nhóm
+            </a>
+
+            <a class="nav-item"
+            href="${pageContext.request.contextPath}/teacher/exam-sessions">
+                <span>⏱️</span> Lịch thi
+            </a>
         </nav>
+
+        <div class="sidebar-bottom">
+            <div class="teacher-mini">
+                <div class="teacher-avatar">GV</div>
+                <div>
+                    <div class="teacher-mini-name">Giáo viên</div>
+                    <div class="teacher-mini-role">Khu vực giảng dạy</div>
+                </div>
+            </div>
+        </div>
     </aside>
+
 
     <!-- Main Content -->
     <main class="main-content" style="padding: 28px; flex: 1;">
@@ -312,7 +341,7 @@
                                         %>
                                             <li class="q-option-item <%= opt.isCorrect() ? "correct" : "" %>">
                                                 <span>
-                                                    <strong>Ý <%= ýIndex++ %>:</strong> <%= opt.getOptionText() %>
+                                                    <strong>Ý <%= subIndex++ %>:</strong> <%= opt.getOptionText() %>
                                                 </span>
                                                 <% if (opt.isCorrect()) { %>
                                                     <span style="font-size: 11px; background: #16a34a; color: white; padding: 2px 6px; border-radius: 4px;">ĐÚNG (Đ)</span>

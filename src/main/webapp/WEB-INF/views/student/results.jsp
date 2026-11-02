@@ -22,10 +22,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Káº¿t Quáº£ BÃ i Thi | <%= examTitle %></title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Káº¿t Quáº£ BÃ i Thi | <%= examTitle %></title>
+    <title>Kết Quả Bài Thi | <%= examTitle %></title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/student.css">
 </head>
 <body>

@@ -1,196 +1,130 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%!
+    // Mã hóa thông báo trước khi đưa vào HTML để tránh chèn mã HTML/JavaScript.
+    private String escapeHtml(String value) {
+        if (value == null) return "";
+        return value.replace("&", "&amp;")
+                    .replace("<", "&lt;")
+                    .replace(">", "&gt;")
+                    .replace("\"", "&quot;")
+                    .replace("'", "&#x27;");
+    }
+%>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng Nhập | OnlineExam - Hệ Thống Thi Trực Tuyến</title>
-    
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#eff6ff',
-                            100: '#dbeafe',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                            900: '#1e3a8a'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    
-    <!-- React & ReactDOM CDN -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <!-- Babel standalone để biên dịch JSX trên trình duyệt -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
-    <!-- Google Fonts Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-    </style>
+    <meta name="theme-color" content="#172554">
+    <title>Đăng nhập | OnlineExam</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/auth.css">
 </head>
-<body class="bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950 min-h-screen flex items-center justify-center p-4">
+<body>
+    <main class="login-shell">
+        <section class="login-card" aria-labelledby="login-title">
+            <header class="login-header">
+                <div class="brand-mark" aria-hidden="true">OE</div>
+                <h1 id="login-title">OnlineExam Portal</h1>
+                <p>Hệ thống khảo sát &amp; luyện thi trực tuyến THPT QG</p>
+            </header>
 
-    <!-- Container render React Component -->
-    <!-- Truyền lỗi an toàn qua thuộc tính data của HTML -->
-    <div id="react-root" 
-        data-error="${requestScope.error != null ? requestScope.error : ''}" 
-        class="w-full max-w-md"></div>
+            <%
+                String errorMessage = (String) request.getAttribute("error");
+                if (errorMessage != null && !errorMessage.isBlank()) {
+            %>
+                <div class="login-error" role="alert">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         aria-hidden="true">
+                        <path d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/>
+                    </svg>
+                    <span><%= escapeHtml(errorMessage) %></span>
+                </div>
+            <% } %>
 
-    <!-- React JSX Script -->
-    <script type="text/babel">
-        const { useState } = React;
-
-        function LoginForm() {
-            
-            const [username, setUsername] = useState("");
-            const [password, setPassword] = useState("");
-            const [showPassword, setShowPassword] = useState(false);
-            const [isLoading, setIsLoading] = useState(false);
-
-            // Nhận thông báo lỗi từ request của Servlet nếu có
-            const serverError = document.getElementById('react-root')?.dataset?.error || "";
-
-            const handleSubmit = (e) => {
-                if (!username.trim() || !password.trim()) {
-                    e.preventDefault();
-                    return;
-                }
-                setIsLoading(true);
-                // Cho phép form HTML submit bình thường về AuthServlet
-            };
-
-            return (
-                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl p-8 text-white transition-all duration-300 hover:shadow-blue-500/10">
-                    
-                    {/* Header Logo */}
-                    <div className="text-center mb-8">
-                        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 shadow-lg shadow-blue-500/30 mb-4">
-                            <span className="text-2xl font-black tracking-wider text-white">OE</span>
-                        </div>
-                        <h1 className="text-2xl font-bold tracking-tight text-white mb-1">OnlineExam Portal</h1>
-                        <p className="text-sm text-slate-300">Hệ thống khảo sát & luyện thi trực tuyến THPT QG</p>
-                    </div>
-
-                    {/* Server Error Message */}
-                    {serverError && (
-                        <div className="mb-6 p-3.5 bg-rose-500/20 border border-rose-500/40 rounded-xl text-rose-200 text-sm flex items-center gap-3 animate-shake">
-                            <svg className="w-5 h-5 flex-shrink-0 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                            </svg>
-                            <span>{serverError}</span>
-                        </div>
-                    )}
-
-                    {/* Login Form */}
-                    <form method="POST" action="${pageContext.request.contextPath}/auth/login" onSubmit={handleSubmit} className="space-y-5">
-                        
-                        {/* Username Input */}
-                        <div>
-                            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
-                                Tên đăng nhập
-                            </label>
-                            <div className="relative">
-                                <input
-                                    id="username"
-                                    name="username"
-                                    type="text"
-                                    value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
-                                    placeholder="Nhập username hoặc mã học sinh..."
-                                    required
-                                    className="w-full bg-slate-900/50 border border-slate-700/60 rounded-xl px-4 py-3 pl-11 text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                                />
-                                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Password Input */}
-                        <div>
-                            <div className="flex justify-between items-center mb-2">
-                                <label className="text-xs font-semibold uppercase tracking-wider text-slate-300">
-                                    Mật khẩu
-                                </label>
-                            </div>
-                            <div className="relative">
-                                <input
-                                    id="password"
-                                    name="password"
-                                    type={showPassword ? "text" : "password"}
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="Nhập mật khẩu..."
-                                    required
-                                    className="w-full bg-slate-900/50 border border-slate-700/60 rounded-xl px-4 py-3 pl-11 pr-11 text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                                />
-                                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                    </svg>
-                                </div>
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white transition-colors"
-                                >
-                                    {showPassword ? (
-                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
-                                        </svg>
-                                    ) : (
-                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg>
-                                    )}
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Submit Button with Loading State */}
-                        <button
-                            type="submit"
-                            disabled={isLoading}
-                            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-blue-500/25 transition-all duration-200 transform active:scale-[0.98] flex items-center justify-center gap-2"
-                        >
-                            {isLoading ? (
-                                <>
-                                    <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    <span>Đang xác thực...</span>
-                                </>
-                            ) : (
-                                <span>Đăng nhập hệ thống &rarr;</span>
-                            )}
-                        </button>
-                    </form>
-
-                    {/* Footer Guide */}
-                    <div className="mt-8 pt-6 border-t border-white/10 text-center text-xs text-slate-400">
-                        © 2026 OnlineExam System &bull; Bảo mật thông tin thí sinh
+            <form id="login-form" method="POST"
+                  action="${pageContext.request.contextPath}/auth/login">
+                <div class="form-group">
+                    <label class="form-label" for="username">Tên đăng nhập</label>
+                    <div class="input-wrap">
+                        <svg class="input-icon" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                            <circle cx="12" cy="8" r="4"/>
+                            <path d="M5 21v-2a7 7 0 0 1 14 0v2"/>
+                        </svg>
+                        <input class="form-input" id="username" name="username"
+                               type="text" placeholder="Nhập username hoặc mã học sinh..."
+                               autocomplete="username" autocapitalize="none"
+                               spellcheck="false" required autofocus>
                     </div>
                 </div>
-            );
-        }
 
-        const root = ReactDOM.createRoot(document.getElementById('react-root'));
-        root.render(<LoginForm />);
+                <div class="form-group">
+                    <label class="form-label" for="password">Mật khẩu</label>
+                    <div class="input-wrap">
+                        <svg class="input-icon" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                            <rect x="3" y="10" width="18" height="11" rx="2"/>
+                            <path d="M7 10V7a5 5 0 0 1 10 0v3"/>
+                        </svg>
+                        <input class="form-input" id="password" name="password"
+                               type="password" placeholder="Nhập mật khẩu..."
+                               autocomplete="current-password" required>
+                        <button class="password-toggle" id="toggle-password"
+                                type="button" aria-label="Hiện mật khẩu"
+                                aria-controls="password" aria-pressed="false">
+                            <svg id="eye-icon" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" stroke-width="1.8"
+                                 stroke-linecap="round" stroke-linejoin="round"
+                                 aria-hidden="true">
+                                <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <button class="submit-button" id="submit-button" type="submit">
+                    <span id="submit-label">Đăng nhập hệ thống <span aria-hidden="true">→</span></span>
+                </button>
+            </form>
+
+            <footer class="login-footer">
+                © 2026 OnlineExam System &bull; Bảo mật thông tin thí sinh
+            </footer>
+        </section>
+    </main>
+
+    <script>
+        const passwordInput = document.getElementById("password");
+        const togglePassword = document.getElementById("toggle-password");
+        const eyeIcon = document.getElementById("eye-icon");
+        const loginForm = document.getElementById("login-form");
+        const submitButton = document.getElementById("submit-button");
+
+        togglePassword.addEventListener("click", function () {
+            const willShow = passwordInput.type === "password";
+            passwordInput.type = willShow ? "text" : "password";
+            togglePassword.setAttribute("aria-label", willShow ? "Ẩn mật khẩu" : "Hiện mật khẩu");
+            togglePassword.setAttribute("aria-pressed", String(willShow));
+
+            eyeIcon.innerHTML = willShow
+                ? '<path d="M3 3l18 18M10.6 10.6a2 2 0 0 0 2.8 2.8"/><path d="M9.9 5.2A10.8 10.8 0 0 1 12 5c6.4 0 10 7 10 7a15.8 15.8 0 0 1-3 3.8M6.2 6.2C3.5 8 2 12 2 12s3.6 7 10 7a10.5 10.5 0 0 0 4-.8"/>'
+                : '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>';
+        });
+
+        loginForm.addEventListener("submit", function (event) {
+            if (!loginForm.checkValidity()) {
+                event.preventDefault();
+                loginForm.reportValidity();
+                return;
+            }
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<span class="spinner" aria-hidden="true"></span><span>Đang xác thực...</span>';
+        });
     </script>
 </body>
 </html>
