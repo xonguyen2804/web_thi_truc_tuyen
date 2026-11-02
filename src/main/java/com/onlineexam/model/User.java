@@ -1,11 +1,12 @@
 package com.onlineexam.model;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
  * Model cho bảng Users trong cơ sở dữ liệu OnlineExam.
  */
-public class User {
+public class User implements Serializable{
     private int userId;
     private String username;
     private String passwordHash;

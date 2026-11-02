@@ -53,7 +53,7 @@ public class AuthServlet extends HttpServlet {
                         "Tên đăng nhập hoặc mật khẩu không đúng");
 
                 request.getRequestDispatcher(
-                        "/WEB-INF/views/auth/false.jsp").forward(request, response);
+                        "/WEB-INF/views/auth/login.jsp").forward(request, response);
 
                 return;
             }
@@ -79,11 +79,11 @@ public class AuthServlet extends HttpServlet {
                     break;
 
                 case "TEACHER":
-                    destination = "/teacher/home";
+                    destination = "/teacher/dashboard";
                     break;
 
                 case "STUDENT":
-                    destination = "/student/home";
+                    destination = "/student/dashboard";
                     break;
 
                 default:
@@ -102,6 +102,8 @@ public class AuthServlet extends HttpServlet {
 
             session = request.getSession(true);
 
+            session.setAttribute("user", user);
+
             session.setAttribute("userId", user.getUserId());
             session.setAttribute("userName", user.getUsername());
             session.setAttribute("role", roleName);
@@ -115,14 +117,13 @@ public class AuthServlet extends HttpServlet {
                     request.getContextPath() + destination);
 
         } catch (Exception e) {
-
             System.err.println("===== LOI KHI DANG NHAP =====");
-
             e.printStackTrace();
 
+            // in ra loi cu the
             response.sendError(
                     HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Lỗi xử lý đăng nhập, kiểm tra log Tomcat");
+                    "Chi tiết lỗi: " + e.getClass().getName() + " - " + e.getMessage());
         }
     }
 

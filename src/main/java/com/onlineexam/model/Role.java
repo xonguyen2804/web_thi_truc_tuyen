@@ -1,11 +1,12 @@
 package com.onlineexam.model;
 
+import java.io.Serializable;
 /**
  * Model for Role.
  * TODO: Add fields, constructors, getters, and setters based on the agreed
  * database schema.
  */
-public class Role {
+public class Role implements Serializable{
     private int roleId;
     private String roleName;
 

@@ -30,265 +30,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ngân Hàng Câu Hỏi | OnlineExam</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/teacher.css">
-    <style>
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-        .stat-card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 18px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-        }
-        .stat-card .val {
-            font-size: 26px;
-            font-weight: 800;
-            color: #0f172a;
-            line-height: 1.2;
-        }
-        .stat-card .lbl {
-            font-size: 13px;
-            color: #64748b;
-            margin-top: 4px;
-        }
-        .stat-card .icon-box {
-            width: 44px;
-            height: 44px;
-            border-radius: 10px;
-            display: grid;
-            place-items: center;
-            font-size: 20px;
-        }
-
-        .filter-card, .table-card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
-        }
-
-        .filter-form {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            align-items: flex-end;
-        }
-        .filter-group {
-            flex: 1;
-            min-width: 180px;
-        }
-        .filter-group label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            color: #475569;
-            margin-bottom: 6px;
-        }
-        .form-control {
-            width: 100%;
-            padding: 9px 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            font-size: 14px;
-            box-sizing: border-box;
-            background: #fff;
-        }
-        .form-control:focus {
-            outline: none;
-            border-color: #2563eb;
-            box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            padding: 9px 16px;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            transition: all 0.15s ease-in-out;
-            text-decoration: none;
-        }
-        .btn-primary { background: #2563eb; color: #ffffff; }
-        .btn-primary:hover { background: #1d4ed8; }
-        .btn-success { background: #16a34a; color: #ffffff; }
-        .btn-success:hover { background: #15803d; }
-        .btn-secondary { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
-        .btn-secondary:hover { background: #e2e8f0; }
-        .btn-danger { background: #ef4444; color: #ffffff; }
-        .btn-danger:hover { background: #dc2626; }
-        .btn-warning { background: #f59e0b; color: #ffffff; }
-        .btn-warning:hover { background: #d97706; }
-        .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 4px; }
-
-        /* Bulk Action Bar */
-        .bulk-bar {
-            display: none;
-            position: sticky;
-            top: 15px;
-            z-index: 100;
-            background: #1e293b;
-            color: #ffffff;
-            padding: 12px 20px;
-            border-radius: 8px;
-            margin-bottom: 18px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            align-items: center;
-            justify-content: space-between;
-            animation: slideDown 0.2s ease-out;
-        }
-        @keyframes slideDown {
-            from { transform: translateY(-10px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        .bulk-bar.active { display: flex; }
-        .bulk-actions { display: flex; gap: 10px; align-items: center; }
-
-        /* Table */
-        .q-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-        .q-table th, .q-table td {
-            padding: 12px 14px;
-            border-bottom: 1px solid #e2e8f0;
-            text-align: left;
-            vertical-align: middle;
-        }
-        .q-table th {
-            background: #f8fafc;
-            color: #475569;
-            font-weight: 600;
-            font-size: 13px;
-        }
-        .q-table tr:hover td {
-            background: #f8fafc;
-        }
-
-        /* Badges */
-        .badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.3px;
-        }
-        .badge-single { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
-        .badge-tf { background: #f5f3ff; color: #6d28d9; border: 1px solid #ddd6fe; }
-        .badge-short { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
-        .badge-exam { background: #f1f5f9; color: #334155; font-size: 11px; padding: 2px 6px; border-radius: 3px; }
-
-        /* Question preview details */
-        .q-detail-container {
-            display: none;
-            background: #f8fafc;
-            padding: 16px 20px;
-            border-bottom: 2px solid #cbd5e1;
-            font-size: 13px;
-        }
-        .q-options-list {
-            margin: 10px 0 0 0;
-            padding-left: 0;
-            list-style: none;
-            display: grid;
-            gap: 6px;
-        }
-        .q-option-item {
-            padding: 8px 12px;
-            border-radius: 6px;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .q-option-item.correct {
-            background: #f0fdf4;
-            border-color: #86efac;
-            font-weight: 600;
-            color: #166534;
-        }
-        .q-explanation {
-            margin-top: 10px;
-            padding: 8px 12px;
-            background: #fefce8;
-            border-left: 3px solid #eab308;
-            color: #713f12;
-            border-radius: 0 4px 4px 0;
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(2px);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            overflow-y: auto;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .modal.active { display: flex; }
-        .modal-content {
-            background: #ffffff;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 680px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            animation: modalFadeIn 0.2s ease-out;
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-        }
-        @keyframes modalFadeIn {
-            from { transform: scale(0.95); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-        .modal-header {
-            padding: 16px 20px;
-            border-bottom: 1px solid #e2e8f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .modal-header h3 { margin: 0; font-size: 17px; color: #0f172a; }
-        .modal-close {
-            background: none; border: none; font-size: 20px; cursor: pointer; color: #94a3b8;
-        }
-        .modal-close:hover { color: #0f172a; }
-        .modal-body {
-            padding: 20px;
-            overflow-y: auto;
-        }
-        .modal-footer {
-            padding: 14px 20px;
-            border-top: 1px solid #e2e8f0;
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            background: #f8fafc;
-            border-radius: 0 0 12px 12px;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ngân Hàng Câu Hỏi | OnlineExam</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/teacher.css">
 </head>
 <body>
 <div class="teacher-layout">
@@ -518,13 +263,13 @@
                             <% } %>
                         </td>
                         <td style="text-align: right; white-space: nowrap;">
-                            <button type="button" class="btn btn-sm btn-secondary" onclick="toggleDetails(<%= q.getQuestionId() %>)" title="Xem chi tiết câu hỏi">
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="toggleDetails('<%= q.getQuestionId() %>')" title="Xem chi tiết câu hỏi">
                                 👁 Đáp án
                             </button>
-                            <button type="button" class="btn btn-sm btn-primary" onclick="openEditModal(<%= q.getQuestionId() %>)" title="Sửa nội dung câu hỏi">
+                            <button type="button" class="btn btn-sm btn-primary" onclick="openEditModal('<%= q.getQuestionId() %>')" title="Sửa nội dung câu hỏi">
                                 ✏ Sửa
                             </button>
-                            <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete(<%= q.getQuestionId() %>)" title="Xóa câu hỏi">
+                            <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete('<%= q.getQuestionId() %>')" title="Xóa câu hỏi">
                                 🗑
                             </button>
                         </td>
@@ -562,7 +307,7 @@
                                     <div style="font-size: 12px; font-weight: 600; color: #475569;">CÁC Ý XÉT ĐÚNG / SAI:</div>
                                     <ul class="q-options-list">
                                         <%
-                                            int ýIndex = 1;
+                                            int subIndex = 1;
                                             for (Option opt : q.getOptions()) {
                                         %>
                                             <li class="q-option-item <%= opt.isCorrect() ? "correct" : "" %>">

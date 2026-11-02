@@ -18,24 +18,6 @@
     <meta charset="UTF-8">
     <title>Quản Lý & Mở Ca Thi | OnlineExam</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/teacher.css">
-    <style>
-        .session-grid { display: grid; grid-template-columns: 380px 1fr; gap: 24px; margin-top: 20px; }
-        .card { background: #fff; padding: 22px; border-radius: 10px; border: 1px solid #e2e8f0; }
-        .form-group { margin-bottom: 14px; }
-        .form-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: #334155; }
-        .form-control { width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
-        .btn { padding: 9px 16px; border-radius: 6px; font-weight: 700; cursor: pointer; border: none; font-size: 13px; }
-        .btn-primary { background: #2563eb; color: #fff; width: 100%; }
-        .btn-success { background: #16a34a; color: #fff; }
-        .btn-danger { background: #ef4444; color: #fff; }
-        .badge { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
-        .badge-open { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
-        .badge-sched { background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; }
-        .badge-closed { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
-        .table-sessions { width: 100%; border-collapse: collapse; font-size: 14px; }
-        .table-sessions th, .table-sessions td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #e2e8f0; }
-        .table-sessions th { background: #f8fafc; color: #475569; }
-    </style>
 </head>
 <body>
 <div class="teacher-layout">

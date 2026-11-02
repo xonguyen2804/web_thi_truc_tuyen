@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.util.List" %>
-<%@ page import="com.onlineexam.controller.StudentDashboardServlet.ActiveSessionDTO" %>
-<%@ page import="com.onlineexam.controller.StudentDashboardServlet.AttemptHistoryDTO" %>
+<%@ page import="com.onlineexam.dao.DashboardDAO.ActiveSessionDTO" %>
+<%@ page import="com.onlineexam.dao.DashboardDAO.AttemptHistoryDTO" %>
 <%
     String studentName = (String) request.getAttribute("studentName");
     Integer totalExamsDone = (Integer) request.getAttribute("totalExamsDone");
@@ -16,99 +16,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trang Học Sinh | OnlineExam</title>
-    <style>
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; 
-            background: #f8fafc; 
-            margin: 0; 
-            padding: 24px; 
-            color: #1e293b; 
-        }
-        .container { max-width: 1000px; margin: 0 auto; }
-        
-        /* Navbar mini */   
-        .top-nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #fff;
-            padding: 14px 20px;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            margin-bottom: 24px;
-        }
-        .brand { font-size: 18px; font-weight: 800; color: #2563eb; display: flex; align-items: center; gap: 8px; }
-        
-        /* Welcome Banner */
-        .welcome-banner {
-            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-            color: #fff;
-            border-radius: 14px;
-            padding: 28px;
-            margin-bottom: 24px;
-            box-shadow: 0 4px 12px rgba(37,99,235,0.15);
-        }
-        .welcome-banner h1 { margin: 0 0 6px 0; font-size: 24px; font-weight: 800; }
-        .welcome-banner p { margin: 0; font-size: 14px; opacity: 0.9; }
-
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-            margin-bottom: 28px;
-        }
-        .stat-card {
-            background: #fff;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-        }
-        .stat-val { font-size: 28px; font-weight: 800; color: #0f172a; line-height: 1.2; }
-        .stat-lbl { font-size: 13px; color: #64748b; margin-top: 4px; font-weight: 500; }
-
-        /* Card Section */
-        .section-card {
-            background: #fff;
-            border: 1px solid #e2e8f0;
-            border-radius: 14px;
-            padding: 22px;
-            margin-bottom: 24px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-        }
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-        .section-header h2 { margin: 0; font-size: 17px; color: #0f172a; }
-
-        /* Table */
-        .data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        .data-table th, .data-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #e2e8f0; }
-        .data-table th { background: #f8fafc; color: #475569; font-weight: 600; font-size: 13px; }
-        
-        .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
-        .badge-pass { background: #dcfce7; color: #166534; }
-        .badge-fail { background: #fee2e2; color: #991b1b; }
-        .badge-open { background: #dcfce7; color: #166534; }
-
-        .btn { padding: 8px 14px; border-radius: 6px; font-weight: 700; cursor: pointer; border: none; font-size: 13px; text-decoration: none; display: inline-block; }
-        .btn-primary { background: #2563eb; color: #fff; }
-        .btn-primary:hover { background: #1d4ed8; }
-        .btn-outline { background: #f1f5f9; color: #475569; }
-        .btn-outline:hover { background: #e2e8f0; }
-
-        /* Modal Overlay */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15,23,42,0.6); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
-        .modal-overlay.active { display: flex !important; }
-        .modal-box { background: #fff; border-radius: 14px; padding: 24px; width: 90%; max-width: 380px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.15); }
-
-        .score-passed { color: #16a34a; font-size: 16px; }
-        .score-failed { color: #dc2626; font-size: 16px; }
-    </style>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/student.css">
 </head>
 <body>
 

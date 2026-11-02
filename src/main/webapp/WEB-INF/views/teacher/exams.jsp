@@ -7,21 +7,6 @@
     <meta charset="UTF-8">
     <title>Quản lý Đề Thi | OnlineExam</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/teacher.css">
-    <style>
-        .exam-container { display: grid; grid-template-columns: 380px 1fr; gap: 24px; margin-top: 20px; }
-        .form-card, .table-card { background: #fff; padding: 24px; border-radius: 10px; border: 1px solid #e2e8f0; }
-        .form-group { margin-bottom: 14px; }
-        .form-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: #334155; }
-        .form-control { width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
-        .btn-submit { width: 100%; padding: 11px; background: #2563eb; color: white; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; }
-        .btn-submit:hover { background: #1d4ed8; }
-        .exam-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        .exam-table th, .exam-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #e2e8f0; }
-        .exam-table th { background: #f8fafc; color: #475569; font-weight: 600; }
-        .badge { padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
-        .badge-draft { background: #fef3c7; color: #92400e; }
-        .badge-published { background: #dcfce7; color: #166534; }
-    </style>
 </head>
 <body>
 <div class="teacher-layout">

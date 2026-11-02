@@ -6,7 +6,7 @@
 <%@ page import="java.time.LocalDate" %>
 <%@ page import="java.time.format.DateTimeFormatter" %>
 <%@ page import="java.util.List" %>
-<%@ page import="com.onlineexam.controller.TeacherDashboardServlet.RecentSessionDTO" %>
+<%@ page import="com.onlineexam.dao.DashboardDAO.RecentSessionDTO" %>
 <%
     String currentDate = LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, 'ngày' dd/MM/yyyy", new java.util.Locale("vi", "VN")));
     
@@ -33,150 +33,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tổng Quan Giáo Viên | Hệ Thống Thi Thử Online</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/teacher.css">
-    <style>
-        :root {
-            --primary: #1e40af;
-            --primary-dark: #1e3a8a;
-            --bg-light: #f8fafc;
-            --border-color: #e2e8f0;
-            --text-dark: #0f172a;
-            --text-muted: #64748b;
-        }
-
-        body {
-            background-color: var(--bg-light);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            color: var(--text-dark);
-            margin: 0;
-            padding: 0;
-        }
-
-        /* Banner chào mừng & giới thiệu hệ thống */
-        .welcome-card {
-            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
-            color: #ffffff;
-            border-radius: 12px;
-            padding: 24px 28px;
-            margin-bottom: 24px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        }
-
-        .welcome-badge {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.2);
-            color: #ffffff;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        /* Thẻ thống kê */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 18px;
-            margin-bottom: 24px;
-        }
-
-        .stat-card {
-            background: #ffffff;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 18px 20px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-        }
-
-        .stat-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-        }
-
-        .stat-number {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--text-dark);
-            line-height: 1.1;
-        }
-
-        .stat-desc {
-            font-size: 12px;
-            color: #64748b;
-            margin-top: 6px;
-        }
-
-        /* Bảng dữ liệu */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-
-        .data-table th {
-            background: #f8fafc;
-            color: #475569;
-            font-weight: 600;
-            text-align: left;
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 13px;
-        }
-
-        .data-table td {
-            padding: 12px 16px;
-            border-bottom: 1px solid #f1f5f9;
-        }
-
-        .data-table tbody tr:hover {
-            background-color: #f8fafc;
-        }
-
-        /* Khối thao tác nhanh */
-        .action-card {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 18px;
-            background: #ffffff;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            text-decoration: none;
-            color: inherit;
-            margin-bottom: 12px;
-            transition: all 0.2s ease;
-        }
-
-        .action-card:hover {
-            border-color: #3b82f6;
-            background: #f8fafc;
-            transform: translateX(3px);
-        }
-
-        .action-icon {
-            width: 38px;
-            height: 38px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            font-weight: 700;
-        }
-
-        .badge-status {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        .badge-open { background: #dcfce7; color: #15803d; }
-        .badge-sched { background: #e0f2fe; color: #0369a1; }
-        .badge-closed { background: #f1f5f9; color: #475569; }
-    </style>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tổng Quan Giáo Viên | Hệ Thống Thi Thử Online</title>
+    <!-- CSS chung của giáo viên -->
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/teacher.css">
+    <!-- CSS riêng cho Dashboard vừa tách -->
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/teacher-dashboard.css">
 </head>
 <body>
 <div class="teacher-layout">

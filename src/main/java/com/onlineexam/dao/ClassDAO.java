@@ -227,4 +227,81 @@ public class ClassDAO {
         return new SchoolClass(rs.getInt("class_id"), rs.getString("class_name"),
                 rs.getString("description"), rs.getInt("created_by"));
     }
+
+        // DTO cho Lớp và Nhóm
+    public static class ClassDTO {
+        public int classId;
+        public String className;
+        public List<GroupDTO> groups = new ArrayList<>();
+
+        public int getClassId() { return classId; }
+        public String getClassName() { return className; }
+        public List<GroupDTO> getGroups() { return groups; }
+    }
+
+    public static class GroupDTO {
+        public int groupId;
+        public String groupName;
+        public String description;
+
+        public int getGroupId() { return groupId; }
+        public String getGroupName() { return groupName; }
+        public String getDescription() { return description; }
+    }
+
+    // Lấy toàn bộ danh sách lớp kèm các nhóm bên trong
+    public List<ClassDTO> findAllWithGroups() throws SQLException {
+        List<ClassDTO> classes = new ArrayList<>();
+        String sqlClasses = "SELECT class_id, class_name FROM Classes ORDER BY class_name ASC";
+        String sqlGroups = "SELECT group_id, group_name, description FROM `Groups` WHERE class_id = ? ORDER BY group_name ASC";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement psC = conn.prepareStatement(sqlClasses);
+             ResultSet rsC = psC.executeQuery()) {
+
+            while (rsC.next()) {
+                ClassDTO c = new ClassDTO();
+                c.classId = rsC.getInt("class_id");
+                c.className = rsC.getString("class_name");
+
+                try (PreparedStatement psG = conn.prepareStatement(sqlGroups)) {
+                    psG.setInt(1, c.classId);
+                    try (ResultSet rsG = psG.executeQuery()) {
+                        while (rsG.next()) {
+                            GroupDTO g = new GroupDTO();
+                            g.groupId = rsG.getInt("group_id");
+                            g.groupName = rsG.getString("group_name");
+                            g.description = rsG.getString("description");
+                            c.groups.add(g);
+                        }
+                    }
+                }
+                classes.add(c);
+            }
+        }
+        return classes;
+    }
+
+    // Thêm lớp mới
+    public boolean createClass(String className, int createdBy) throws SQLException {
+        String sql = "INSERT INTO Classes (class_name, created_by) VALUES (?, ?)";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, className);
+            ps.setInt(2, createdBy);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    // Thêm nhóm mới vào lớp
+    public boolean createGroup(int classId, String groupName, String description) throws SQLException {
+        String sql = "INSERT INTO `Groups` (class_id, group_name, description) VALUES (?, ?, ?)";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, classId);
+            ps.setString(2, groupName);
+            ps.setString(3, description);
+            return ps.executeUpdate() > 0;
+        }
+    }
 }
