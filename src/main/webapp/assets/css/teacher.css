@@ -3476,3 +3476,952 @@ button.btn-primary:hover {
     }
 }
 
+/* =====================================================
+   EXAM SESSIONS - MATCH TEACHER DASHBOARD
+   ===================================================== */
+
+/* Tiêu đề trang */
+.sessions-page-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 22px;
+}
+
+.sessions-page-heading .page-eyebrow {
+    margin-bottom: 7px;
+    color: #2563eb;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.sessions-page-heading h1 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.sessions-page-heading p {
+    margin: 5px 0 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.sessions-date {
+    flex-shrink: 0;
+    padding: 9px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #fff;
+    color: #475569;
+    font-size: 12px;
+}
+
+/* Thống kê giống Dashboard */
+.sessions-overview {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+    margin: 22px 0 26px;
+}
+
+/* Bố cục hai khu vực */
+.sessions-content-grid {
+    display: grid;
+    grid-template-columns: minmax(300px, 0.85fr) minmax(0, 1.5fr);
+    align-items: start;
+    gap: 20px;
+}
+
+/* Card form và danh sách */
+.session-create-card,
+.session-list-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 13px;
+    box-shadow: 0 3px 12px rgba(15, 23, 42, .035);
+}
+
+.session-create-card:hover {
+    box-shadow: 0 7px 18px rgba(15, 23, 42, .055);
+}
+
+/* Tiêu đề các khu vực */
+.session-section-heading h2,
+.session-list-heading h2 {
+    color: #1e3a8a;
+    font-weight: 750;
+}
+
+.session-section-icon {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+    .sessions-overview {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .sessions-content-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .sessions-overview {
+        grid-template-columns: 1fr;
+    }
+
+    .sessions-page-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+/* =====================================================
+   TEACHER EXAMS - DASHBOARD STYLE
+   ===================================================== */
+
+/* Tiêu đề trang */
+.exams-page-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 22px;
+}
+
+.exams-page-heading .page-eyebrow {
+    margin-bottom: 7px;
+    color: #2563eb;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.exams-page-heading h1 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.exams-page-heading p {
+    margin: 5px 0 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.exams-date {
+    flex-shrink: 0;
+    padding: 8px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 7px;
+    background: #fff;
+    color: #475569;
+    font-size: 12px;
+}
+
+/* Ba thẻ thống kê */
+.exams-overview {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    margin: 22px 0 26px;
+}
+
+/* Bố cục form và danh sách */
+.exams-content-grid {
+    display: grid;
+    grid-template-columns: minmax(300px, .85fr) minmax(0, 1.5fr);
+    align-items: start;
+    gap: 20px;
+}
+
+/* Card tạo đề và danh sách */
+.exam-create-card,
+.exam-list-card {
+    min-width: 0;
+    padding: 23px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 13px;
+    box-shadow: 0 3px 12px rgba(15, 23, 42, .035);
+    transition: box-shadow .2s ease;
+}
+
+.exam-create-card:hover,
+.exam-list-card:hover {
+    box-shadow: 0 7px 18px rgba(15, 23, 42, .055);
+}
+
+/* Tiêu đề trong card */
+.exam-section-heading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 22px;
+}
+
+.exam-section-heading h2,
+.exam-list-heading h2 {
+    margin: 0;
+    color: #1e3a8a;
+    font-size: 16px;
+    font-weight: 750;
+}
+
+.exam-section-heading p,
+.exam-list-heading p {
+    margin: 5px 0 0;
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+.exam-section-icon {
+    width: 43px;
+    height: 43px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    border-radius: 11px;
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+/* Form */
+.exam-form-group {
+    min-width: 0;
+    margin-bottom: 17px;
+}
+
+.exam-form-group label {
+    display: block;
+    margin-bottom: 7px;
+    color: #334155;
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.exam-input {
+    width: 100%;
+    min-width: 0;
+    min-height: 42px;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #f8fbff;
+    color: #1e293b;
+    font-family: inherit;
+    font-size: 12px;
+    transition: .2s ease;
+}
+
+.exam-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, .13);
+}
+
+.exam-form-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.exam-input-with-unit {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.exam-input-with-unit .exam-input {
+    flex: 1;
+}
+
+.exam-input-with-unit span {
+    color: #64748b;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+/* Khu vực upload */
+.exam-upload-area {
+    padding: 22px 15px;
+    border: 1px dashed #93c5fd;
+    border-radius: 10px;
+    background: #f8fbff;
+    text-align: center;
+    transition: .2s ease;
+}
+
+.exam-upload-area:hover {
+    border-color: #2563eb;
+    background: #eff6ff;
+}
+
+.exam-upload-icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+.exam-upload-title {
+    color: #1e40af;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.exam-upload-desc {
+    margin-top: 5px;
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+.exam-file-input {
+    display: block;
+    width: 100%;
+    margin-top: 13px;
+    color: #475569;
+    font-size: 11px;
+}
+
+.exam-format-guide {
+    margin-top: 12px;
+    padding: 12px;
+    border: 1px solid #dbeafe;
+    border-radius: 8px;
+    background: #eff6ff;
+    color: #334155;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.exam-format-guide strong {
+    color: #1e40af;
+}
+
+.exam-format-guide p {
+    margin: 7px 0;
+    font-family: monospace;
+}
+
+.exam-format-guide span {
+    color: #64748b;
+}
+
+/* Nút tạo đề */
+.exam-submit-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 44px;
+    padding: 11px 16px;
+    border: 1px solid #1d4ed8;
+    border-radius: 9px;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #fff;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 750;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, .2);
+    transition: .2s ease;
+}
+
+.exam-submit-btn:hover {
+    background: linear-gradient(135deg, #1d4ed8, #1e40af);
+    transform: translateY(-2px);
+    box-shadow: 0 7px 15px rgba(37, 99, 235, .25);
+}
+
+/* Tiêu đề danh sách */
+.exam-list-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.exam-total-badge {
+    flex-shrink: 0;
+    padding: 6px 10px;
+    border-radius: 20px;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+/* Bảng đề thi */
+.exam-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.modern-exam-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.modern-exam-table thead th {
+    padding: 13px 11px;
+    border-bottom: 1px solid #bfdbfe;
+    background: #eff6ff;
+    color: #1e40af;
+    font-size: 11px;
+    font-weight: 750;
+    white-space: nowrap;
+}
+
+.modern-exam-table tbody td {
+    padding: 14px 11px;
+    border-bottom: 1px solid #edf1f6;
+    color: #475569;
+    font-size: 12px;
+    vertical-align: middle;
+}
+
+.modern-exam-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.modern-exam-table tbody tr:hover {
+    background: #f5f9ff;
+}
+
+.exam-id {
+    color: #64748b;
+    font-weight: 650;
+}
+
+.exam-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 160px;
+}
+
+.exam-row-icon {
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    border-radius: 8px;
+    background: #eff6ff;
+}
+
+.exam-name-cell strong {
+    color: #1e293b;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.exam-duration {
+    color: #475569;
+    font-weight: 650;
+    white-space: nowrap;
+}
+
+/* Trạng thái đề thi */
+.exam-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 9px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 750;
+    white-space: nowrap;
+}
+
+.exam-status > span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.status-published {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.status-published > span {
+    background: #16a34a;
+}
+
+.status-draft {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-draft > span {
+    background: #f59e0b;
+}
+
+/* Thông báo */
+.exam-alert {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 17px;
+    margin-bottom: 22px;
+    border: 1px solid #bbf7d0;
+    border-radius: 10px;
+    background: #f0fdf4;
+    color: #166534;
+}
+
+.exam-alert-icon {
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #dcfce7;
+    font-weight: 800;
+}
+
+.exam-alert strong {
+    font-size: 13px;
+}
+
+.exam-alert p {
+    margin: 3px 0 0;
+    font-size: 12px;
+}
+
+/* Trạng thái chưa có đề thi */
+.exam-empty-state {
+    padding: 55px 20px;
+    text-align: center;
+}
+
+.exam-empty-icon {
+    margin-bottom: 12px;
+    font-size: 38px;
+}
+
+.exam-empty-state h3 {
+    margin: 0 0 7px;
+    color: #334155;
+    font-size: 15px;
+}
+
+.exam-empty-state p {
+    color: #94a3b8;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+    .exams-content-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .exams-overview {
+        grid-template-columns: 1fr;
+    }
+
+    .exams-page-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .exam-create-card,
+    .exam-list-card {
+        padding: 17px;
+    }
+
+    .exam-form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .modern-exam-table {
+        min-width: 560px;
+    }
+}
+
+/* =====================================================
+   CLASSES PAGE - BLUE DASHBOARD UI
+   ===================================================== */
+
+/* Tiêu đề trang */
+.classes-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 22px;
+}
+
+.classes-header .page-title {
+    margin: 0 0 8px;
+    font-size: 24px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.classes-header .page-desc {
+    max-width: 650px;
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.classes-header-icon {
+    width: 56px;
+    height: 56px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    border-radius: 14px;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 27px;
+}
+
+/* Thống kê */
+.classes-overview {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* Bố cục hai cột */
+.classes-content-grid {
+    display: grid;
+    grid-template-columns: minmax(290px, 0.85fr) minmax(0, 1.5fr);
+    align-items: start;
+    gap: 22px;
+    margin-top: 24px;
+}
+
+.classes-forms-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+}
+
+/* Card biểu mẫu và danh sách */
+.classes-form-card,
+.classes-list-card {
+    min-width: 0;
+    padding: 22px;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 3px 12px rgba(15, 23, 42, .04);
+    transition: box-shadow .2s ease;
+}
+
+.classes-form-card:hover,
+.classes-list-card:hover {
+    box-shadow: 0 7px 18px rgba(15, 23, 42, .07);
+}
+
+/* Tiêu đề biểu mẫu */
+.classes-card-heading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 22px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e8edf5;
+}
+
+.classes-card-icon {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    border-radius: 11px;
+    font-size: 19px;
+}
+
+.classes-card-icon.icon-blue {
+    background: #eff6ff;
+}
+
+.classes-card-icon.icon-green {
+    background: #ecfdf5;
+}
+
+.classes-card-heading h3 {
+    margin: 0;
+    color: #1e3a8a;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.classes-card-heading p {
+    margin: 5px 0 0;
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+/* Trường nhập liệu */
+.classes-form-card .form-group {
+    margin-bottom: 17px;
+}
+
+.classes-form-card .form-group label {
+    display: block;
+    margin-bottom: 7px;
+    color: #334155;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.classes-form-card .form-control {
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #f8fafc;
+    color: #1e293b;
+    font-family: inherit;
+    font-size: 12px;
+    transition: border-color .2s, box-shadow .2s;
+}
+
+.classes-form-card .form-control:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, .12);
+}
+
+.classes-form-card .classes-textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+.classes-form-card .required-mark {
+    color: #ef4444;
+}
+
+/* Nút thêm */
+.classes-form-card .btn-block {
+    width: 100%;
+    min-height: 43px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 750;
+}
+
+/* Tiêu đề danh sách */
+.classes-list-card {
+    padding: 0;
+    overflow: hidden;
+}
+
+.classes-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 20px 22px;
+    background: linear-gradient(110deg, #eff6ff, #dbeafe);
+    border-bottom: 1px solid #bfdbfe;
+}
+
+.classes-list-header h3 {
+    margin: 0;
+    color: #1e40af;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.classes-list-header p {
+    margin: 5px 0 0;
+    color: #64748b;
+    font-size: 11px;
+}
+
+.classes-count {
+    flex-shrink: 0;
+    padding: 7px 11px;
+    border-radius: 20px;
+    background: #ffffff;
+    color: #2563eb;
+    font-size: 11px;
+    font-weight: 750;
+}
+
+.classes-list-body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 20px;
+}
+
+/* Từng khối lớp */
+.classes-item {
+    padding: 17px;
+    border: 1px solid #e2e8f0;
+    border-radius: 11px;
+    background: #ffffff;
+    transition: border-color .2s, box-shadow .2s;
+}
+
+.classes-item:hover {
+    border-color: #93c5fd;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, .07);
+}
+
+.classes-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.classes-item-title {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+}
+
+.class-item-icon {
+    width: 39px;
+    height: 39px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    border-radius: 10px;
+    background: #eff6ff;
+    font-size: 18px;
+}
+
+.classes-item-title h4 {
+    margin: 0;
+    color: #1e3a8a;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.classes-item-title span {
+    display: block;
+    margin-top: 4px;
+    color: #94a3b8;
+    font-size: 10px;
+}
+
+.group-count {
+    flex-shrink: 0;
+    padding: 6px 10px;
+    border-radius: 20px;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 10px;
+    font-weight: 750;
+}
+
+/* Các nhóm trực thuộc */
+.classes-groups-heading {
+    margin: 17px 0 10px;
+    padding-top: 13px;
+    border-top: 1px solid #edf1f6;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.classes-group-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.group-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 11px;
+    border: 1px solid #bfdbfe;
+    border-radius: 7px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-size: 11px;
+    font-weight: 650;
+}
+
+.classes-empty-groups {
+    color: #94a3b8;
+    font-size: 11px;
+    font-style: italic;
+}
+
+/* Trạng thái chưa có dữ liệu */
+.classes-empty-state {
+    padding: 55px 20px;
+    text-align: center;
+}
+
+.empty-state-icon {
+    margin-bottom: 13px;
+    font-size: 40px;
+}
+
+.classes-empty-state h4 {
+    margin: 0 0 8px;
+    color: #334155;
+    font-size: 15px;
+}
+
+.classes-empty-state p {
+    max-width: 350px;
+    margin: 0 auto;
+    color: #94a3b8;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+    .classes-content-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .classes-overview {
+        grid-template-columns: 1fr;
+    }
+
+    .classes-header {
+        align-items: flex-start;
+    }
+
+    .classes-header .page-title {
+        font-size: 21px;
+    }
+
+    .classes-form-card,
+    .classes-list-body {
+        padding: 16px;
+    }
+
+    .classes-list-header {
+        padding: 17px;
+    }
+}

@@ -46,7 +46,7 @@
     <title>Quản lý ca thi | OnlineExam</title>
 
     <link rel="stylesheet"
-          href="${pageContext.request.contextPath}/assets/css/teacher.css?v=11">
+          href="${pageContext.request.contextPath}/assets/css/teacher.css?v=12">
 </head>
 
 <body>
@@ -106,15 +106,22 @@
     <!-- MAIN CONTENT -->
     <main class="main-content">
 
-        <div class="page-eyebrow">QUẢN LÝ TỔ CHỨC THI</div>
-
-        <header class="sessions-header">
+        <header class="sessions-page-heading">
             <div>
+                <div class="page-eyebrow">QUẢN LÝ TỔ CHỨC THI</div>
+
                 <h1>Quản lý ca thi</h1>
+
                 <p>
                     Lập lịch thi, phân công đối tượng dự thi và điều khiển
                     trạng thái phòng thi.
                 </p>
+            </div>
+
+            <div class="sessions-date">
+                <%= java.time.LocalDate.now().format(
+                    java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")
+                ) %>
             </div>
         </header>
 
@@ -138,42 +145,30 @@
         <% } %>
 
         <!-- THỐNG KÊ -->
-        <section class="sessions-overview">
+        <section class="stats-grid sessions-overview">
 
-            <div class="session-stat-card">
-                <div class="session-stat-icon session-stat-blue">📅</div>
-                <div>
-                    <div class="session-stat-label">Tổng số ca thi</div>
-                    <div class="session-stat-value"><%= totalSessions %></div>
-                    <div class="session-stat-note">Ca thi đã được tạo</div>
-                </div>
+            <div class="stat-card">
+                <div class="stat-title">Tổng số ca thi</div>
+                <div class="stat-number"><%= totalSessions %></div>
+                <div class="stat-desc">Ca thi đã được tạo</div>
             </div>
 
-            <div class="session-stat-card">
-                <div class="session-stat-icon session-stat-green">🟢</div>
-                <div>
-                    <div class="session-stat-label">Phòng đang mở</div>
-                    <div class="session-stat-value"><%= openCount %></div>
-                    <div class="session-stat-note">Có thể tham gia dự thi</div>
-                </div>
+            <div class="stat-card">
+                <div class="stat-title">Phòng đang mở</div>
+                <div class="stat-number"><%= openCount %></div>
+                <div class="stat-desc">Có thể tham gia dự thi</div>
             </div>
 
-            <div class="session-stat-card">
-                <div class="session-stat-icon session-stat-orange">🕒</div>
-                <div>
-                    <div class="session-stat-label">Ca thi đã lên lịch</div>
-                    <div class="session-stat-value"><%= scheduledCount %></div>
-                    <div class="session-stat-note">Đang chờ mở phòng</div>
-                </div>
+            <div class="stat-card">
+                <div class="stat-title">Ca thi đã lên lịch</div>
+                <div class="stat-number"><%= scheduledCount %></div>
+                <div class="stat-desc">Đang chờ mở phòng</div>
             </div>
 
-            <div class="session-stat-card">
-                <div class="session-stat-icon session-stat-gray">🔒</div>
-                <div>
-                    <div class="session-stat-label">Phòng đã đóng</div>
-                    <div class="session-stat-value"><%= closedCount %></div>
-                    <div class="session-stat-note">Không còn mở tham gia</div>
-                </div>
+            <div class="stat-card">
+                <div class="stat-title">Phòng đã đóng</div>
+                <div class="stat-number"><%= closedCount %></div>
+                <div class="stat-desc">Không còn mở tham gia</div>
             </div>
 
         </section>

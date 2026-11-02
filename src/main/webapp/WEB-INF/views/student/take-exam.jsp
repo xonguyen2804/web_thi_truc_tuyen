@@ -1,4 +1,4 @@
-﻿<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.util.List" %>
 <%@ page import="com.onlineexam.dao.AttemptDAO.QuestionDTO" %>
 <%@ page import="com.onlineexam.dao.AttemptDAO.OptionDTO" %>
@@ -13,53 +13,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= examTitle %> | LÃ m BÃ i Thi</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/student.css">
+    <title><%= examTitle %> | Làm Bài Thi</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/student.css?v=3">
 </head>
 <body>
 
-<div class="header-bar">
-    <div>
-        <h2 style="margin: 0; font-size: 18px; color: #0f172a;"><%= examTitle %></h2>
-        <span style="font-size: 12px; color: #64748b;">MÃ£ phiÃªn thi: #<%= attemptId %></span>
+<header class="exam-topbar">
+    <div class="exam-topbar-info">
+        <span class="exam-topbar-label">PHÒNG THI TRỰC TUYẾN</span>
+        <h2><%= examTitle %></h2>
+        <span class="exam-attempt-id">Mã phiên thi: #<%= attemptId %></span>
     </div>
-    <div class="timer-box">
-        â± <span id="countdown">--:--</span>
+
+    <div class="exam-timer">
+        <span class="exam-timer-icon">⏱</span>
+        <div>
+            <span class="exam-timer-label">Thời gian còn lại</span>
+            <strong id="countdown">--:--</strong>
+        </div>
     </div>
-</div>
+</header>
 
 <form id="examForm" action="${pageContext.request.contextPath}/student/submit-exam" method="POST">
     <input type="hidden" name="attemptId" value="<%= attemptId %>">
     <input type="hidden" id="durationMinutesInput" value="<%= durationMinutes %>">
 
-    <div class="layout-exam">
+    <div class="layout-exam student-take-exam">
         <div class="questions-col">
             <% if (questions != null) {
                 int qIndex = 1;
                 for (QuestionDTO q : questions) { %>
-                    <div class="question-card" id="q-<%= q.questionId %>">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-                            <div style="font-weight: 700; font-size: 15px; color: #0f172a;">
-                                CÃ¢u <%= qIndex++ %>: <%= q.questionText %>
+                    <div class="question-card student-question-card" id="q-<%= q.questionId %>">
+                        <div class="student-question-heading">
+                            <div class="student-question-title">
+                                Câu <%= qIndex++ %>: <%= q.questionText %>
                             </div>
-                            <span style="font-size: 11px; font-weight: 700; background: #e2e8f0; color: #475569; padding: 2px 6px; border-radius: 4px; white-space: nowrap;">
-                                <%= "TRUE_FALSE".equalsIgnoreCase(q.questionType) ? "ÄÃšNG / SAI" : ("SHORT_ANSWER".equalsIgnoreCase(q.questionType) ? "TRáº¢ Lá»œI NGáº®N" : "TRáº®C NGHIá»†M") %>
+
+                            <span class="student-question-type">
+                                <%= "TRUE_FALSE".equalsIgnoreCase(q.questionType) ? "ĐÚNG / SAI" : ("SHORT_ANSWER".equalsIgnoreCase(q.questionType) ? "TRẢ LỜI NGẮN" : "TRẮC NGHIỆM") %>
                             </span>
                         </div>
 
-                        <!-- 1. Dáº NG TRáº¢ Lá»œI NGáº®N -->
+                        <!-- 1. Dạng trả lời ngắn-->
                         <% if ("SHORT_ANSWER".equalsIgnoreCase(q.questionType)) { %>
                             <div>
-                                <input type="text" name="short_q_<%= q.questionId %>" maxlength="10" placeholder="Äiá»n káº¿t quáº£ vÃ o Ä‘Ã¢y (vÃ­ dá»¥: 0.5 hoáº·c 50)..." style="width: 100%; padding: 11px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+                                <input type="text" class="student-short-answer" name="short_q_<%= q.questionId %>" maxlength="10" placeholder="Điền kết quả vào đây (ví dụ: 0.5 hoặc 50)..." style="width: 100%; padding: 11px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
                             </div>
 
-                        <!-- 2. Dáº NG ÄÃšNG / SAI (4 Ã CON) -->
+                        <!-- 2. Dạng ĐÚNG/SAI (4 Ã CON) -->
                         <% } else if ("TRUE_FALSE".equalsIgnoreCase(q.questionType)) { %>
-                            <table class="tf-table">
+                            <table class="tf-table student-tf-table">
                                 <thead>
                                     <tr>
-                                        <th>Ã nháº­n Ä‘á»‹nh</th>
-                                        <th style="width: 150px; text-align: center;">Lá»±a chá»n</th>
+                                        <th>Ý nhận định</th>
+                                        <th style="width: 150px; text-align: center;">Lựa chọn</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -70,9 +77,9 @@
                                                 <strong><%= subChar++ %>)</strong> <%= opt.optionText %>
                                             </td>
                                             <td>
-                                                <div class="tf-radio-group">
+                                                <div class="tf-radio-group student-tf-radio-group">
                                                     <label class="tf-radio-item text-correct">
-                                                        <input type="radio" name="tf_opt_<%= opt.optionId %>" value="true"> ÄÃºng
+                                                        <input type="radio" name="tf_opt_<%= opt.optionId %>" value="true"> Đúng
                                                     </label>
                                                     <label class="tf-radio-item text-wrong">
                                                         <input type="radio" name="tf_opt_<%= opt.optionId %>" value="false"> Sai
@@ -84,12 +91,12 @@
                                 </tbody>
                             </table>
 
-                        <!-- 3. Dáº NG TRáº®C NGHIá»†M 4 Lá»°A CHá»ŒN (SINGLE) -->
+                        <!-- 3. Dạng trắc nghiệm 4 đáp án (SINGLE) -->
                         <% } else { %>
                             <div class="options">
                                 <% char optChar = 'A';
                                    for (OptionDTO opt : q.options) { %>
-                                    <label class="opt-label">
+                                    <label class="opt-label student-option">
                                         <input type="radio" name="q_<%= q.questionId %>" value="<%= opt.optionId %>">
                                         <span><strong><%= optChar++ %>.</strong> <%= opt.optionText %></span>
                                     </label>
@@ -102,8 +109,9 @@
         </div>
 
         <div>
-            <div class="sidebar-nav-q">
-                <h4 style="margin: 0 0 10px 0; font-size: 14px;">Báº£ng cÃ¢u há»i</h4>
+            <aside class="sidebar-nav-q student-question-sidebar">
+                <h4 class="student-sidebar-title">Bảng câu hỏi</h4>
+                <p class="student-sidebar-desc">Chọn số câu để di chuyển nhanh</p>
                 <div class="q-grid">
                     <% if (questions != null) {
                         for (int i = 1; i <= questions.size(); i++) { %>
@@ -111,8 +119,10 @@
                     <%  }
                     } %>
                 </div>
-                <button type="button" class="btn-submit" onclick="confirmSubmit()">Ná»˜P BÃ€I THI</button>
-            </div>
+                <button type="button" class="btn-submit student-submit-btn" onclick="confirmSubmit()">
+                    NỘP BÀI THI
+                </button>
+            </aside>
         </div>
     </div>
 </form>
@@ -141,7 +151,7 @@
             if (totalSeconds < 0) {
                 clearInterval(timerInterval);
                 timerDisplay.innerText = "00:00";
-                alert("ÄÃ£ háº¿t thá»i gian lÃ m bÃ i! Há»‡ thá»‘ng tá»± Ä‘á»™ng ná»™p bÃ i thi cá»§a báº¡n.");
+                alert("Đã hết thời gian làm bài! Hệ thống tự động nộp bài thi của bạn.");
                 document.getElementById('examForm').submit();
                 return;
             }
@@ -150,7 +160,7 @@
     });
 
     function confirmSubmit() {
-        if (confirm("Báº¡n cÃ³ cháº¯c cháº¯n muá»‘n ná»™p bÃ i thi ngay bÃ¢y giá» khÃ´ng?")) {
+        if (confirm("Bạn có chắc chắn muốn nộp bài thi ngay bây giờ không?")) {
             document.getElementById('examForm').submit();
         }
     }

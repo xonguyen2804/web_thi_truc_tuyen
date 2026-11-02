@@ -13,105 +13,172 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phòng Thi Trực Tuyến | OnlineExam</title>
     <link rel="stylesheet"
-        href="${pageContext.request.contextPath}/assets/css/student.css">
+        href="${pageContext.request.contextPath}/assets/css/student.css?v=4">
 </head>
-<body>
-<div class="container">
-    <div class="header">
-        <h1>Phòng Thi Trực Tuyến</h1>
-        <p>Tìm ca thi được giáo viên phân công, nhập mật khẩu phòng để bắt đầu làm bài.</p>
+<body class="student-available-page">
+<div class="container student-available-container">
+    <div class="available-header">
+        <div class="available-header-icon">📝</div>
+        <div>
+            <h1>Phòng Thi Trực Tuyến</h1>
+            <p>
+                Danh sách các ca thi được giáo viên phân công.
+                Chọn ca thi phù hợp để bắt đầu làm bài.
+            </p>
+        </div>
     </div>
 
     <% if (request.getParameter("error") != null) { %>
-        <div style="padding: 12px 16px; background: #fee2e2; color: #991b1b; border-radius: 8px; margin-bottom: 20px; border: 1px solid #fecaca;">
-            ✕ <%= request.getParameter("error") %>
+        <div class="available-error">
+            <span>⚠</span>
+            <span><%= request.getParameter("error") %></span>
         </div>
     <% } %>
 
     <!-- Khung tìm kiếm ca thi -->
-    <form action="${pageContext.request.contextPath}/student/exams" method="GET" class="search-box">
-        <input type="text" name="keyword" class="form-control" placeholder="Nhập tên ca thi, tên đề thi..." value="<%= keyword != null ? keyword : "" %>">
-        <button type="submit" class="btn btn-primary">🔍 Tìm Kiếm</button>
+    <form action="${pageContext.request.contextPath}/student/exams"
+        method="GET"
+        class="available-search">
+
+        <div class="available-search-input">
+            <span>🔍</span>
+            <input type="text"
+                name="keyword"
+                class="form-control"
+                placeholder="Nhập tên ca thi, tên đề thi..."
+                value="<%= keyword != null ? keyword : "" %>">
+        </div>
+
+        <button type="submit" class="btn btn-primary available-search-btn">
+            Tìm kiếm
+        </button>
     </form>
 
     <!-- Danh sách ca thi -->
-    <div class="session-list">
+    <div class="available-session-list">
         <% if (sessions != null && !sessions.isEmpty()) {
             for (SessionViewDTO s : sessions) {
                 boolean isOpen = "OPEN".equalsIgnoreCase(s.getStatus());
                 boolean hasPass = s.isHasPassword();
         %>
-            <div class="exam-card">
-                <div>
-                    <div style="margin-bottom: 6px;">
+            <div class="available-exam-card">
+
+                <div class="available-exam-content">
+
+                    <div class="available-exam-badges">
                         <span class="badge <%= isOpen ? "badge-open" : "badge-sched" %>">
                             <%= isOpen ? "🟢 ĐANG MỞ PHÒNG" : "🕒 LÊN LỊCH CHỜ" %>
                         </span>
-                        
+
                         <% if (hasPass) { %>
-                            <span style="font-size: 11px; background: #fef3c7; color: #92400e; padding: 2px 6px; border-radius: 4px; margin-left: 4px;">🔒 Có mật khẩu</span>
+                            <span class="available-password-badge">
+                                🔒 Có mật khẩu
+                            </span>
+                        <% } else { %>
+                            <span class="available-free-badge">
+                                ✓ Không cần mật khẩu
+                            </span>
                         <% } %>
                     </div>
-                    <h3 style="margin: 0 0 6px 0; font-size: 18px; color: #0f172a;"><%= s.getSessionName() %></h3>
-                    <div style="font-size: 13px; color: #475569;">
-                        Đề thi: <strong><%= s.getExamTitle() %></strong> &bull; Thời gian: <strong><%= s.getDurationMinutes() %> phút</strong>
+
+                    <h3 class="available-exam-title">
+                        <%= s.getSessionName() %>
+                    </h3>
+
+                    <div class="available-exam-name">
+                        Đề thi:
+                        <strong><%= s.getExamTitle() %></strong>
                     </div>
-                    <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
-                       Lịch: <%= s.getStartTime() != null ? s.getStartTime() : "" %>
-                        &rarr;
-                        <%= s.getEndTime() != null ? s.getEndTime() : "" %>
+
+                    <div class="available-exam-info">
+                        <span>⏱ <%= s.getDurationMinutes() %> phút</span>
+                        <span class="available-info-divider">|</span>
+                        <span>
+                            📅
+                            <%= s.getStartTime() != null ? s.getStartTime() : "" %>
+                            &rarr;
+                            <%= s.getEndTime() != null ? s.getEndTime() : "" %>
+                        </span>
                     </div>
+
                 </div>
-                <div>
+
+                <div class="available-exam-action">
                     <% if (isOpen) { %>
-                        <button type="button" 
-                                class="btn btn-primary" 
-                                data-session-id="<%= s.getSessionId() %>" 
+                        <button type="button"
+                                class="btn btn-primary available-enter-btn"
+                                data-session-id="<%= s.getSessionId() %>"
                                 data-session-name="<%= s.getSessionName() %>"
                                 data-has-pass="<%= hasPass %>"
                                 onclick="openPassModal(this)">
-                            Vào Thi &rarr;
+                            Vào thi <span>→</span>
                         </button>
                     <% } else { %>
-                        <button type="button" class="btn" style="background: #e2e8f0; color: #94a3b8; cursor: not-allowed;" disabled>
-                            Chưa Mở
+                        <button type="button"
+                                class="available-disabled-btn"
+                                disabled>
+                            Chưa mở
                         </button>
                     <% } %>
                 </div>
+
             </div>
         <%  }
         } else { %>
-            <div style="text-align: center; padding: 48px; background: #fff; border-radius: 12px; color: #94a3b8; border: 1px dashed #cbd5e1;">
-                Không tìm thấy ca thi nào đang mở phù hợp với từ khóa của bạn.
+
+            <div class="available-empty">
+                <div class="available-empty-icon">📭</div>
+                <h3>Không tìm thấy ca thi</h3>
+                <p>
+                    Không có ca thi nào phù hợp với từ khóa tìm kiếm của bạn.
+                </p>
             </div>
+
         <% } %>
     </div>
 </div>
 
 <!-- ================= MODAL NHẬP MẬT KHẨU PHÒNG THI ================= -->
-<div id="passModal" class="modal-overlay" onclick="handleOverlayClick(event)">
-    <div class="modal-box">
-        <h3 class="modal-title" id="modalSessionTitle">Vào Phòng Thi</h3>
-        <p class="modal-desc" id="modalSessionDesc">Vui lòng nhập mật khẩu phòng thi do giáo viên cung cấp để bắt đầu làm bài.</p>
+<div id="passModal"
+     class="modal-overlay available-modal-overlay"
+     onclick="handleOverlayClick(event)">
+
+    <div class="modal-box available-modal-box">
+        <div class="available-modal-icon">🔐</div>
+            <h3 class="modal-title available-modal-title" id="modalSessionTitle">
+                Vào Phòng Thi
+            </h3>
+
+            <p class="modal-desc available-modal-desc" id="modalSessionDesc">
+                Vui lòng nhập mật khẩu phòng thi do giáo viên cung cấp để bắt đầu làm bài.
+            </p>
         
         <form action="${pageContext.request.contextPath}/student/check-pass" method="POST">
             <input type="hidden" name="sessionId" id="modalSessionId">
             
-            <div id="passwordFieldGroup" style="margin-bottom: 16px;">
-                <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #334155;">
-                    Mật khẩu phòng thi:
+            <div id="passwordFieldGroup" class="available-password-group">
+                <label for="sessionPasswordInput" class="available-password-label">
+                    Mật khẩu phòng thi
                 </label>
-                <input type="password" 
-                       name="sessionPassword" 
-                       id="sessionPasswordInput" 
-                       class="form-control" 
-                       style="width: 100%; font-size: 15px;" 
-                       placeholder="Nhập mã mật khẩu...">
+                <input type="password"
+                    name="sessionPassword"  
+                    id="sessionPasswordInput"
+                    class="form-control available-password-input"
+                    placeholder="Nhập mật khẩu phòng thi...">
             </div>
 
             <div style="display: flex; justify-content: flex-end; gap: 8px;">
-                <button type="button" class="btn btn-secondary" onclick="closePassModal()">Hủy</button>
-                <button type="submit" class="btn btn-primary">Xác Nhận & Bắt Đầu</button>
+                <div class="available-modal-actions">
+                    <button type="button"
+                            class="btn btn-secondary"
+                            onclick="closePassModal()">
+                        Hủy
+                    </button>
+
+                    <button type="submit" class="btn btn-primary available-confirm-btn">
+                        Xác nhận & Bắt đầu
+                    </button>
+                </div>
             </div>
         </form>
     </div>

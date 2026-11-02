@@ -18,7 +18,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý lớp học và nhóm | OnlineExam</title>
     <link rel="stylesheet"
-          href="${pageContext.request.contextPath}/assets/css/teacher.css?v=2">
+          href="${pageContext.request.contextPath}/assets/css/teacher.css?v=14">
 </head>
 
 <body>
@@ -92,7 +92,7 @@
             <div>
                 <div class="page-eyebrow">QUẢN LÝ ĐỐI TƯỢNG HỌC TẬP</div>
 
-                <h1 class="page-title"></h1>Quản lý lớp học và nhóm</h1>
+                <h1 class="page-title">Quản lý lớp học và nhóm</h1>
 
                 <p class="page-desc">
                     Tổ chức các khối lớp và nhóm học tập để thuận tiện
@@ -104,45 +104,41 @@
         </header>
 
         <!-- Thống kê -->
-        <section class="classes-overview">
+        <section class="stats-grid classes-overview">
 
-            <div class="classes-overview-card">
-                <div class="overview-icon overview-blue">🏫</div>
-                <div>
-                    <div class="overview-label">Tổng số khối lớp</div>
-                    <div class="overview-value">
-                        <%= classList != null ? classList.size() : 0 %>
-                    </div>
+            <div class="stat-card">
+                <div class="stat-title">TỔNG SỐ KHỐI LỚP</div>
+                <div class="stat-number">
+                    <%= classList != null ? classList.size() : 0 %>
                 </div>
+                <div class="stat-desc">Các khối lớp đang được quản lý</div>
             </div>
 
-            <div class="classes-overview-card">
-                <div class="overview-icon overview-green">👥</div>
-                <div>
-                    <div class="overview-label">Tổng số nhóm học</div>
-                    <div class="overview-value">
-                        <%
-                            int totalGroups = 0;
+            <div class="stat-card">
+                <div class="stat-title">TỔNG SỐ NHÓM HỌC</div>
+                <div class="stat-number">
+                    <%
+                        int totalGroups = 0;
 
-                            if (classList != null) {
-                                for (ClassDTO c : classList) {
-                                    if (c.groups != null) {
-                                        totalGroups += c.groups.size();
-                                    }
+                        if (classList != null) {
+                            for (ClassDTO c : classList) {
+                                if (c.groups != null) {
+                                    totalGroups += c.groups.size();
                                 }
                             }
-                        %>
-                        <%= totalGroups %>
-                    </div>
+                        }
+                    %>
+                    <%= totalGroups %>
                 </div>
+                <div class="stat-desc">Tổng số nhóm thuộc các khối lớp</div>
             </div>
 
-            <div class="classes-overview-card">
-                <div class="overview-icon overview-purple">📚</div>
-                <div>
-                    <div class="overview-label">Mô hình tổ chức</div>
-                    <div class="overview-text">Khối lớp → Nhóm học</div>
+            <div class="stat-card">
+                <div class="stat-title">MÔ HÌNH TỔ CHỨC</div>
+                <div class="stat-number" style="font-size: 23px;">
+                    Khối lớp → Nhóm học
                 </div>
+                <div class="stat-desc">Cấu trúc phân cấp học tập</div>
             </div>
 
         </section>

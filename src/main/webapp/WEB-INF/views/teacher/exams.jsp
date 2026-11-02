@@ -11,7 +11,7 @@
     <title>Quản lý đề thi | OnlineExam</title>
 
     <link rel="stylesheet"
-          href="${pageContext.request.contextPath}/assets/css/teacher.css?v=3">
+          href="${pageContext.request.contextPath}/assets/css/teacher.css?v=13">
 </head>
 <body>
 
@@ -70,17 +70,27 @@
     <!-- MAIN CONTENT -->
     <main class="main-content">
 
-        <div class="page-eyebrow">QUẢN LÝ BÀI KIỂM TRA</div>
-
-        <div class="exams-header">
+        <header class="exams-page-heading">
             <div>
+                <div class="page-eyebrow">QUẢN LÝ BÀI KIỂM TRA</div>
+
                 <h1>Quản lý đề thi</h1>
+
                 <p>
                     Tạo đề thi, nhập câu hỏi từ tệp văn bản và quản lý
                     các đề kiểm tra trong hệ thống.
                 </p>
             </div>
-        </div>
+
+            <div class="exams-date">
+                <%= java.time.LocalDate.now().format(
+                    java.time.format.DateTimeFormatter.ofPattern(
+                        "EEEE, 'ngày' dd/MM/yyyy",
+                        new java.util.Locale("vi", "VN")
+                    )
+                ) %>
+            </div>
+        </header>
 
         <%
             List<Exam> exams = (List<Exam>) request.getAttribute("exams");
@@ -111,33 +121,24 @@
         <% } %>
 
         <!-- THỐNG KÊ -->
-        <section class="exams-overview">
+        <section class="stats-grid exams-overview">
 
-            <div class="exams-stat-card">
-                <div class="exams-stat-icon stat-blue">📝</div>
-                <div>
-                    <div class="exams-stat-label">Tổng số đề thi</div>
-                    <div class="exams-stat-value"><%= totalExams %></div>
-                    <div class="exams-stat-note">Đề thi trong hệ thống</div>
-                </div>
+            <div class="stat-card">
+                <div class="stat-title">Tổng số đề thi</div>
+                <div class="stat-number"><%= totalExams %></div>
+                <div class="stat-desc">Đề thi trong hệ thống</div>
             </div>
 
-            <div class="exams-stat-card">
-                <div class="exams-stat-icon stat-green">🌐</div>
-                <div>
-                    <div class="exams-stat-label">Đề đã công khai</div>
-                    <div class="exams-stat-value"><%= publishedCount %></div>
-                    <div class="exams-stat-note">Trạng thái PUBLISHED</div>
-                </div>
+            <div class="stat-card">
+                <div class="stat-title">Đề đã công khai</div>
+                <div class="stat-number"><%= publishedCount %></div>
+                <div class="stat-desc">Học sinh có thể tham gia khi được mở ca thi</div>
             </div>
 
-            <div class="exams-stat-card">
-                <div class="exams-stat-icon stat-orange">📄</div>
-                <div>
-                    <div class="exams-stat-label">Đề đang lưu nháp</div>
-                    <div class="exams-stat-value"><%= draftCount %></div>
-                    <div class="exams-stat-note">Trạng thái DRAFT</div>
-                </div>
+            <div class="stat-card">
+                <div class="stat-title">Đề đang lưu nháp</div>
+                <div class="stat-number"><%= draftCount %></div>
+                <div class="stat-desc">Đề thi chưa được công khai</div>
             </div>
 
         </section>
