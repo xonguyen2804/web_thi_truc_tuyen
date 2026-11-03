@@ -295,6 +295,7 @@
                     <div class="class-box classes-item">
 
                         <div class="classes-item-header">
+
                             <div class="classes-item-title">
                                 <div class="class-item-icon">🏫</div>
 
@@ -304,9 +305,20 @@
                                 </div>
                             </div>
 
-                            <span class="group-count">
-                                <%= c.groups != null ? c.groups.size() : 0 %> nhóm
-                            </span>
+                            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap">
+
+                                <span class="group-count">
+                                    <%= c.groups != null ? c.groups.size() : 0 %> nhóm
+                                </span>
+
+                                <a href="${pageContext.request.contextPath}/teacher/class-members?classId=<%= c.classId %>"
+                                class="btn btn-primary"
+                                style="text-decoration:none; font-size:13px; padding:8px 12px">
+                                    👥 Quản lý thành viên
+                                </a>
+
+                            </div>
+
                         </div>
 
                         <div class="classes-groups-heading">

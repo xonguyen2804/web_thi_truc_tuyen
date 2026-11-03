@@ -84,7 +84,7 @@ public class DashboardDAO {
         // 2. Thống kê ca thi
         String sqlSessions = """
             SELECT COUNT(*) AS total,
-                   SUM(CASE WHEN status = 'IN_PROGRESS' THEN 1 ELSE 0 END) AS active
+                   SUM(CASE WHEN status = 'OPEN' THEN 1 ELSE 0 END) AS active
             FROM exam_sessions WHERE created_by = ?
         """;
         try (Connection conn = DBConnection.getConnection();

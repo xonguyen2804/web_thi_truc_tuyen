@@ -19,6 +19,11 @@
 <body>
 
 <header class="exam-topbar">
+     <a href="${pageContext.request.contextPath}/student/dashboard"
+        class="exam-home-btn"
+        onclick="return confirmLeaveExam()">
+            ← Trang chủ
+    </a>
     <div class="exam-topbar-info">
         <span class="exam-topbar-label">PHÒNG THI TRỰC TUYẾN</span>
         <h2><%= examTitle %></h2>
@@ -163,6 +168,13 @@
         if (confirm("Bạn có chắc chắn muốn nộp bài thi ngay bây giờ không?")) {
             document.getElementById('examForm').submit();
         }
+    }
+
+    function confirmLeaveExam() {
+        return confirm(
+            "Bạn có chắc muốn rời khỏi trang làm bài không? " +
+            "Bài làm hiện tại chưa được nộp."
+        );
     }
 </script>
 </body>

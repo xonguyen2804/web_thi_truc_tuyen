@@ -138,6 +138,13 @@
     </div>
 </div>
 
+<div class="available-navigation">
+    <a href="${pageContext.request.contextPath}/student/dashboard"
+       class="available-home-btn">
+        ← Quay về trang chủ
+    </a>
+</div>
+
 <!-- ================= MODAL NHẬP MẬT KHẨU PHÒNG THI ================= -->
 <div id="passModal"
      class="modal-overlay available-modal-overlay"

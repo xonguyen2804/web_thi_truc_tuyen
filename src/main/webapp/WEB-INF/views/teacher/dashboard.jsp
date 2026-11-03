@@ -71,7 +71,7 @@
             </a>
             <a class="nav-item" href="${pageContext.request.contextPath}/teacher/classes">
                 <span class="nav-icon">👥</span>
-                Lớp Học & Học Sinh
+                Lớp học và nhóm
             </a>
             <a class="nav-item" href="${pageContext.request.contextPath}/teacher/exam-sessions">
                 <span class="nav-icon">⏱</span>

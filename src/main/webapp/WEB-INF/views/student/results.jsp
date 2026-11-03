@@ -185,9 +185,9 @@
         <!-- Actions -->
         <div class="results-actions">
 
-            <a href="${pageContext.request.contextPath}/student/exams"
+            <a href="${pageContext.request.contextPath}/student/dashboard"
                class="results-back-btn">
-                <span>←</span> Quay lại phòng thi
+                <span>←</span> Quay về trang chủ
             </a>
 
         </div>

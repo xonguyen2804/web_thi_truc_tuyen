@@ -2316,3 +2316,46 @@ body:has(.exam-topbar) {
         box-sizing: border-box;
     }
 }
+
+.available-navigation {
+    display: flex;
+    justify-content: flex-start;
+    margin: 20px 0;
+}
+
+.available-home-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: white;
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.available-home-btn:hover {
+    background: #eff6ff;
+    border-color: #2563eb;
+}
+
+.exam-home-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 14px;
+    background: #ffffff;
+    color: #2563eb;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.exam-home-btn:hover {
+    background: #eff6ff;
+}
