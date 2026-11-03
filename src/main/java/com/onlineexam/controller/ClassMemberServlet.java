@@ -2,8 +2,8 @@
 package com.onlineexam.controller;
 
 import com.onlineexam.dao.ClassDAO;
-import com.onlineexam.dao.ClassMemberDAO;
-import com.onlineexam.dao.ClassMemberDAO.MemberDTO;
+import com.onlineexam.dao.ClassMembershipDAO;
+import com.onlineexam.dao.ClassMembershipDAO.MemberDTO;
 import com.onlineexam.model.SchoolClass;
 import com.onlineexam.model.User;
 
@@ -19,7 +19,7 @@ import java.util.List;
 public class ClassMemberServlet extends HttpServlet {
 
     private final ClassDAO classDAO = new ClassDAO();
-    private final ClassMemberDAO memberDAO = new ClassMemberDAO();
+    private final ClassMembershipDAO memberDAO = new ClassMembershipDAO();
 
     // Kiểm tra tài khoản và quyền truy cập
     private User checkLogin(HttpServletRequest request,
@@ -66,7 +66,7 @@ public class ClassMemberServlet extends HttpServlet {
 
         if (schoolClass == null) {
             response.sendError(
-                HttpServletResponse.SC_NOT_FOUND,
+                404,
                 "Không tìm thấy lớp học"
             );
             return null;
@@ -80,7 +80,7 @@ public class ClassMemberServlet extends HttpServlet {
                 && schoolClass.getCreatedBy() != user.getUserId()) {
 
             response.sendError(
-                HttpServletResponse.SC_FORBIDDEN,
+                404,
                 "Bạn không có quyền quản lý lớp này"
             );
 
@@ -127,7 +127,7 @@ public class ClassMemberServlet extends HttpServlet {
         } catch (NumberFormatException e) {
 
             response.sendError(
-                HttpServletResponse.SC_BAD_REQUEST,
+                400,
                 "Mã lớp không hợp lệ"
             );
 

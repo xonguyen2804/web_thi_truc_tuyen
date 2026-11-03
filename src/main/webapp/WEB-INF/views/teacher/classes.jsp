@@ -89,6 +89,12 @@
 
         <!-- Tiêu đề -->
         <header class="page-header classes-header">
+            <a href="${pageContext.request.contextPath}/teacher/groups?classId=<%= c.classId %>"
+                class="btn btn-primary"
+                style="text-decoration:none; font-size:13px; padding:8px 12px;">
+                    Quản lý nhóm
+            </a>
+
             <div>
                 <div class="page-eyebrow">QUẢN LÝ ĐỐI TƯỢNG HỌC TẬP</div>
 
@@ -332,10 +338,14 @@
                                     for (GroupDTO g : c.groups) {
                             %>
 
-                                <span class="group-tag">
-                                    <span>👥</span>
-                                    <%= g.groupName %>
-                                </span>
+                                <a href="${pageContext.request.contextPath}/teacher/groups?classId=<%= c.classId %>"
+                                    class="group-tag"
+                                    style="text-decoration:none;">
+
+                                        <span>👥</span>
+                                        <%= g.groupName %>
+
+                                </a>
 
                             <%
                                     }

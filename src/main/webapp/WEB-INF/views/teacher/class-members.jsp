@@ -1,7 +1,7 @@
 
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.util.List" %>
-<%@ page import="com.onlineexam.dao.ClassMemberDAO.MemberDTO" %>
+<%@ page import="com.onlineexam.dao.ClassMembershipDAO.MemberDTO" %>
 <%@ page import="com.onlineexam.model.SchoolClass" %>
 
 <%
@@ -26,6 +26,8 @@
         notice = "Vui lòng nhập username.";
     else if ("ERROR".equals(message))
         notice = "Không thể thêm thành viên.";
+    else if ("NOT_STUDENT".equals(message))
+        notice = "Tài khoản này không có vai trò học sinh.";
 %>
 
 <!DOCTYPE html>
