@@ -239,6 +239,7 @@
         <h3 style="margin: 0 0 6px 0; font-size: 17px;" id="modalSessionTitle">Vào Phòng Thi</h3>
         <p style="font-size: 13px; color: #64748b; margin-bottom: 16px;" id="modalDesc">Nhập mật khẩu do giáo viên cung cấp để bắt đầu làm bài.</p>
         <form action="${pageContext.request.contextPath}/student/check-pass" method="POST">
+            <input type="hidden" name="action" value="check-pass">
             <input type="hidden" name="sessionId" id="modalSessionId">
             <div id="passGroup" style="margin-bottom: 16px;">
                 <input type="password" name="sessionPassword" id="modalPassInput" class="form-control" placeholder="Nhập mã mật khẩu..." style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">

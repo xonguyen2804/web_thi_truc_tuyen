@@ -70,19 +70,20 @@ package com.onlineexam.service;
 
 import com.onlineexam.dao.QuestionDAO;
 import com.onlineexam.model.Question;
+import com.onlineexam.model.Option;
+import com.onlineexam.model.Exam;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class QuestionService {
-    private static final Set<String> VALID_TYPES = Set.of(
-            "SINGLE", "MULTIPLE", "TRUE_FALSE", "SHORT_ANSWER"
-    );
 
-    private static final Set<String> VALID_STATUSES = Set.of(
-            "ACTIVE", "INACTIVE"
+    private static final Set<String> VALID_TYPES = Set.of(
+            "SINGLE", "TRUE_FALSE", "SHORT_ANSWER"
     );
 
     private final QuestionDAO questionDAO;
@@ -91,10 +92,72 @@ public class QuestionService {
         this.questionDAO = new QuestionDAO();
     }
 
-    public int createQuestion(int teacherId, String questionText,
-                              String questionType, BigDecimal points,
-                              String explanation) throws SQLException {
-        validateQuestion(teacherId, questionText, questionType, points);
+    // ==================== GET QUESTIONS ====================
+
+    public List<Question> getFilteredQuestions(
+            int teacherId,
+            String keyword,
+            String type,
+            Integer examId) throws SQLException {
+
+        if (teacherId <= 0) {
+            throw new IllegalArgumentException("ID giáo viên không hợp lệ.");
+        }
+
+        if (type != null && !type.isBlank()
+                && !"ALL".equalsIgnoreCase(type)
+                && !VALID_TYPES.contains(type)) {
+            throw new IllegalArgumentException("Loại câu hỏi không hợp lệ.");
+        }
+
+        if (examId != null && examId <= 0) {
+            throw new IllegalArgumentException("ID đề thi không hợp lệ.");
+        }
+
+        return questionDAO.findFiltered(
+                teacherId, keyword, type, examId
+        );
+    }
+
+    public List<Question> getQuestionsByTeacher(int teacherId)
+            throws SQLException {
+        return getFilteredQuestions(teacherId, null, null, null);
+    }
+
+    public Question getQuestionById(int questionId)
+            throws SQLException {
+
+        if (questionId <= 0) {
+            throw new IllegalArgumentException("ID câu hỏi không hợp lệ.");
+        }
+
+        return questionDAO.findById(questionId);
+    }
+
+    // ==================== STATISTICS / EXAMS ====================
+
+    public Map<String, Integer> getStatistics(int teacherId)
+            throws SQLException {
+        return questionDAO.getStatistics(teacherId);
+    }
+
+    public List<Exam> getExamsByTeacher(int teacherId)
+            throws SQLException {
+        return questionDAO.findExamsByTeacher(teacherId);
+    }
+
+    // ==================== CREATE ====================
+
+    public int createQuestion(
+            int teacherId,
+            String questionText,
+            String questionType,
+            BigDecimal points,
+            String explanation) throws SQLException {
+
+        validateQuestion(
+                teacherId, questionText, questionType, points
+        );
 
         Question question = new Question(
                 0,
@@ -110,56 +173,55 @@ public class QuestionService {
         return questionDAO.create(question);
     }
 
-    public Question getQuestionById(int questionId) throws SQLException {
+    // ==================== UPDATE ====================
+
+    public boolean updateQuestion(
+            int questionId,
+            int teacherId,
+            String questionText,
+            String questionType,
+            BigDecimal points,
+            String explanation,
+            List<Option> options,
+            String shortAnswer) throws SQLException {
+
         if (questionId <= 0) {
             throw new IllegalArgumentException("ID câu hỏi không hợp lệ.");
         }
 
-        return questionDAO.findById(questionId);
-    }
-
-    public List<Question> getQuestionsByTeacher(int teacherId)
-            throws SQLException {
-        if (teacherId <= 0) {
-            throw new IllegalArgumentException("ID giáo viên không hợp lệ.");
-        }
-
-        return questionDAO.findByCreator(teacherId);
-    }
-
-    public List<Question> getActiveQuestions() throws SQLException {
-        return questionDAO.findAllActive();
-    }
-
-    public boolean updateQuestion(int questionId, String questionText,
-                                  String questionType, BigDecimal points,
-                                  String explanation, String status)
-            throws SQLException {
-        if (questionId <= 0) {
-            throw new IllegalArgumentException("ID câu hỏi không hợp lệ.");
-        }
-
-        validateQuestion(1, questionText, questionType, points);
-
-        if (status == null || !VALID_STATUSES.contains(status)) {
-            throw new IllegalArgumentException("Trạng thái không hợp lệ.");
-        }
+        validateQuestion(
+                teacherId, questionText, questionType, points
+        );
 
         Question question = questionDAO.findById(questionId);
-        if (question == null) {
+
+        if (question == null || question.getCreatedBy() != teacherId) {
             return false;
+        }
+
+        if ("SINGLE".equals(questionType)) {
+            validateSingle(options);
+        } else if ("TRUE_FALSE".equals(questionType)) {
+            validateTrueFalse(options);
+        } else if ("SHORT_ANSWER".equals(questionType)) {
+            validateShortAnswer(shortAnswer);
         }
 
         question.setQuestionText(questionText.trim());
         question.setQuestionType(questionType);
         question.setDefaultPoints(points);
-        question.setExplanation(explanation);
-        question.setStatus(status);
+        question.setExplanation(
+                explanation == null ? null : explanation.trim()
+        );
 
-        return questionDAO.update(question);
+        return questionDAO.update(question, options, shortAnswer);
     }
 
-    public boolean deactivateQuestion(int questionId) throws SQLException {
+    // ==================== DEACTIVATE ====================
+
+    public boolean deactivateQuestion(int questionId)
+            throws SQLException {
+
         if (questionId <= 0) {
             throw new IllegalArgumentException("ID câu hỏi không hợp lệ.");
         }
@@ -167,19 +229,94 @@ public class QuestionService {
         return questionDAO.deactivate(questionId);
     }
 
-    private void validateQuestion(int teacherId, String questionText,
-                                  String questionType, BigDecimal points) {
+    // ==================== VALIDATION ====================
+
+    private void validateQuestion(
+            int teacherId,
+            String questionText,
+            String questionType,
+            BigDecimal points) {
+
         if (teacherId <= 0) {
             throw new IllegalArgumentException("ID giáo viên không hợp lệ.");
         }
+
         if (questionText == null || questionText.isBlank()) {
-            throw new IllegalArgumentException("Nội dung câu hỏi không được để trống.");
+            throw new IllegalArgumentException(
+                    "Nội dung câu hỏi không được để trống."
+            );
         }
+
         if (questionType == null || !VALID_TYPES.contains(questionType)) {
-            throw new IllegalArgumentException("Loại câu hỏi không hợp lệ.");
+            throw new IllegalArgumentException(
+                    "Loại câu hỏi không hợp lệ."
+            );
         }
+
         if (points == null || points.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Điểm câu hỏi phải lớn hơn 0.");
+            throw new IllegalArgumentException(
+                    "Điểm câu hỏi phải lớn hơn 0."
+            );
+        }
+    }
+
+    private void validateSingle(List<Option> options) {
+        if (options == null || options.size() != 4) {
+            throw new IllegalArgumentException(
+                    "Câu hỏi SINGLE phải có đúng 4 phương án."
+            );
+        }
+
+        int correctCount = 0;
+
+        for (Option option : options) {
+            if (option.getOptionText() == null
+                    || option.getOptionText().isBlank()) {
+                throw new IllegalArgumentException(
+                        "Không được để trống phương án."
+                );
+            }
+
+            if (option.isCorrect()) {
+                correctCount++;
+            }
+        }
+
+        if (correctCount != 1) {
+            throw new IllegalArgumentException(
+                    "Câu hỏi SINGLE phải có đúng 1 đáp án đúng."
+            );
+        }
+    }
+
+    private void validateTrueFalse(List<Option> options) {
+        if (options == null || options.size() != 4) {
+            throw new IllegalArgumentException(
+                    "Câu hỏi TRUE_FALSE phải có đúng 4 ý."
+            );
+        }
+
+        for (Option option : options) {
+            if (option.getOptionText() == null
+                    || option.getOptionText().isBlank()) {
+                throw new IllegalArgumentException(
+                        "Không được để trống nội dung ý Đúng/Sai."
+                );
+            }
+        }
+    }
+
+    private void validateShortAnswer(String answer) {
+        if (answer == null || answer.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Đáp án ngắn không được để trống."
+            );
+        }
+
+        if (answer.trim().length() > 4) {
+            throw new IllegalArgumentException(
+                    "Đáp án ngắn chỉ được tối đa 4 ký tự."
+            );
         }
     }
 }

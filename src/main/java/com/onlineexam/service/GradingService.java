@@ -49,7 +49,7 @@ public class GradingService {
                     // ==========================================
                     // 1. CHẤM CÂU HỎI TRẮC NGHIỆM (SINGLE)
                     // ==========================================
-                    if ("SINGLE".equalsIgnoreCase(questionType) || "MULTIPLE".equalsIgnoreCase(questionType)) {
+                    if ("SINGLE".equalsIgnoreCase(questionType)) {
                         String sqlSingle = "SELECT o.is_correct " +
                                            "FROM attempt_answer_options aao " +
                                            "JOIN options o ON aao.option_id = o.option_id " +
@@ -67,6 +67,7 @@ public class GradingService {
                             }
                         }
                     }
+                    
 
                     // ==========================================
                     // 2. CHẤM CÂU HỎI ĐÚNG / SAI (TRUE_FALSE)
@@ -77,23 +78,32 @@ public class GradingService {
                     // Đúng 4 ý: 1.00 điểm
                     // ==========================================
                     else if ("TRUE_FALSE".equalsIgnoreCase(questionType)) {
+
                         // Lấy tất cả option của câu hỏi này trong DB
                         Map<Integer, Boolean> correctMap = new HashMap<>();
                         String sqlOpts = "SELECT option_id, is_correct FROM options WHERE question_id = ?";
+
                         try (PreparedStatement psO = conn.prepareStatement(sqlOpts)) {
                             psO.setInt(1, questionId);
+
                             try (ResultSet rsO = psO.executeQuery()) {
                                 while (rsO.next()) {
-                                    correctMap.put(rsO.getInt("option_id"), rsO.getBoolean("is_correct"));
+                                    correctMap.put(
+                                        rsO.getInt("option_id"),
+                                        rsO.getBoolean("is_correct")
+                                    );
                                 }
                             }
                         }
 
-                        // Lấy danh sách option_id mà học sinh đã chọn là "ĐÚNG"
+                        // Lấy danh sách option_id mà học sinh đã chọn là ĐÚNG
                         Set<Integer> studentSelectedTrue = new HashSet<>();
-                        String sqlSelected = "SELECT option_id FROM attempt_answer_options WHERE answer_id = ?";
+                        String sqlSelected =
+                            "SELECT option_id FROM attempt_answer_options WHERE answer_id = ?";
+
                         try (PreparedStatement psSel = conn.prepareStatement(sqlSelected)) {
                             psSel.setInt(1, answerId);
+
                             try (ResultSet rsSel = psSel.executeQuery()) {
                                 while (rsSel.next()) {
                                     studentSelectedTrue.add(rsSel.getInt("option_id"));
@@ -101,31 +111,34 @@ public class GradingService {
                             }
                         }
 
-                        // Đếm số lượng ý con học sinh trả lời đúng
-                        int correctSubCount = 0;
-                        for (Map.Entry<Integer, Boolean> entry : correctMap.entrySet()) {
-                            int optId = entry.getKey();
-                            boolean shouldBeTrue = entry.getValue();
-                            boolean studentMarkedTrue = studentSelectedTrue.contains(optId);
+                        // Nếu không chọn bất kỳ ý nào thì không được tính điểm
+                        if (!studentSelectedTrue.isEmpty()) {
 
-                            // Học sinh được tính là đúng ý này nếu:
-                            // Đề bảo ĐÚNG và học sinh chọn ĐÚNG, HOẶC Đề bảo SAI và học sinh không chọn ĐÚNG (tức chọn SAI)
-                            if (shouldBeTrue == studentMarkedTrue) {
-                                correctSubCount++;
+                            int correctSubCount = 0;
+
+                            for (Map.Entry<Integer, Boolean> entry : correctMap.entrySet()) {
+                                int optId = entry.getKey();
+                                boolean shouldBeTrue = entry.getValue();
+                                boolean studentMarkedTrue = studentSelectedTrue.contains(optId);
+
+                                if (shouldBeTrue == studentMarkedTrue) {
+                                    correctSubCount++;
+                                }
+                            }
+
+                            // Áp dụng biểu điểm
+                            if (correctSubCount == 1) {
+                                awardedPoints = new BigDecimal("0.10");
+                            } else if (correctSubCount == 2) {
+                                awardedPoints = new BigDecimal("0.25");
+                            } else if (correctSubCount == 3) {
+                                awardedPoints = new BigDecimal("0.50");
+                            } else if (correctSubCount == 4) {
+                                awardedPoints = new BigDecimal("1.00");
+                                isCorrect = true;
                             }
                         }
 
-                        // Áp dụng biểu điểm mới
-                        if (correctSubCount == 1) {
-                            awardedPoints = new BigDecimal("0.10");
-                        } else if (correctSubCount == 2) {
-                            awardedPoints = new BigDecimal("0.25");
-                        } else if (correctSubCount == 3) {
-                            awardedPoints = new BigDecimal("0.50");
-                        } else if (correctSubCount == 4) {
-                            awardedPoints = new BigDecimal("1.00");
-                            isCorrect = true;
-                        }
                     }
 
                     // ==========================================

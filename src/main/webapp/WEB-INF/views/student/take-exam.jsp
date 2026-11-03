@@ -15,6 +15,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= examTitle %> | Làm Bài Thi</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/student.css?v=3">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/exam-security.css?v=1">
 </head>
 <body>
 
@@ -30,6 +31,10 @@
         <span class="exam-attempt-id">Mã phiên thi: #<%= attemptId %></span>
     </div>
 
+    <button type="button" id="startExamBtn" class="exam-start-btn">
+        BẮT ĐẦU THI
+    </button>
+
     <div class="exam-timer">
         <span class="exam-timer-icon">⏱</span>
         <div>
@@ -40,6 +45,7 @@
 </header>
 
 <form id="examForm" action="${pageContext.request.contextPath}/student/submit-exam" method="POST">
+    <input type="hidden" name="action" value="submit">
     <input type="hidden" name="attemptId" value="<%= attemptId %>">
     <input type="hidden" id="durationMinutesInput" value="<%= durationMinutes %>">
 
@@ -62,7 +68,15 @@
                         <!-- 1. Dạng trả lời ngắn-->
                         <% if ("SHORT_ANSWER".equalsIgnoreCase(q.questionType)) { %>
                             <div>
-                                <input type="text" class="student-short-answer" name="short_q_<%= q.questionId %>" maxlength="10" placeholder="Điền kết quả vào đây (ví dụ: 0.5 hoặc 50)..." style="width: 100%; padding: 11px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+                                <input
+                                    type="text"
+                                    class="student-short-answer short-answer-input"
+                                    name="short_q_<%= q.questionId %>"
+                                    maxlength="4"
+                                    autocomplete="off"
+                                    placeholder="Nhập đáp án (tối đa 4 ký tự)..."
+                                    style="width: 100%; padding: 11px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; box-sizing: border-box;"
+                                >
                             </div>
 
                         <!-- 2. Dạng ĐÚNG/SAI (4 Ã CON) -->
@@ -177,5 +191,6 @@
         );
     }
 </script>
+<script src="${pageContext.request.contextPath}/assets/js/exam-security.js?v=1"></script>
 </body>
 </html>

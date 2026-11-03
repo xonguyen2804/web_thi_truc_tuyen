@@ -4,7 +4,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 public class GenerateHash {
     public static void main(String[] args) {
-        String password = "123"; // Đặt thử mật khẩu ngắn gọn, ví dụ: 123
+        String password = "1"; // Đặt thử mật khẩu ngắn gọn, ví dụ: 123
         
         // Sinh muối và băm mật khẩu
         String salt = BCrypt.gensalt(10);

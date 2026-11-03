@@ -1,0 +1,38 @@
+/* Không cho phép bôi đen nội dung bài thi */
+.student-take-exam {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
+
+/* Chỉ cho phép bôi đen và nhập liệu trong ô trả lời ngắn */
+.student-take-exam .short-answer-input {
+    user-select: text;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+}
+
+/* Nút bắt đầu thi */
+.exam-start-btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #2563eb;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.exam-start-btn:hover {
+    background: #1d4ed8;
+}
+
+.exam-start-btn:disabled {
+    background: #64748b;
+    cursor: not-allowed;
+}
+
+/* Trạng thái đang thi */
+.exam-start-btn.exam-active {
+    background: #16a34a;
+}

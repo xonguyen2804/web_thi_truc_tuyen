@@ -81,6 +81,45 @@ public class AttemptDAO {
         public void setQuestions(List<QuestionDTO> questions) { this.questions = questions; }
     }
 
+    public static class ExamWaitingDTO {
+        private int attemptId;
+        private String examTitle;
+        private String sessionName;
+        private int durationMinutes;
+
+        public int getAttemptId() {
+            return attemptId;
+        }
+
+        public void setAttemptId(int attemptId) {
+            this.attemptId = attemptId;
+        }
+
+        public String getExamTitle() {
+            return examTitle;
+        }
+
+        public void setExamTitle(String examTitle) {
+            this.examTitle = examTitle;
+        }
+
+        public String getSessionName() {
+            return sessionName;
+        }
+
+        public void setSessionName(String sessionName) {
+            this.sessionName = sessionName;
+        }
+
+        public int getDurationMinutes() {
+            return durationMinutes;
+        }
+
+        public void setDurationMinutes(int durationMinutes) {
+            this.durationMinutes = durationMinutes;
+        }
+    }
+
     private Connection connection;
 
     public AttemptDAO() {}
@@ -269,40 +308,86 @@ public class AttemptDAO {
         return list;
     }
 
-    // 4. Lấy chi tiết bài thi để làm (Take Exam)
-    public TakeExamDetailDTO getTakeExamDetail(int attemptId) throws SQLException {
+    // Lấy chi tiết bài thi, đồng thời xác minh lượt thi thuộc học sinh đang đăng nhập
+    public TakeExamDetailDTO getTakeExamDetail(int attemptId, int userId)
+            throws SQLException {
+
         String sql = """
-            SELECT a.attempt_id, es.session_name, e.exam_id, e.exam_title AS exam_title, e.duration_minutes
+            SELECT a.attempt_id,
+                es.session_name,
+                e.exam_id,
+                e.exam_title AS exam_title,
+                e.duration_minutes
             FROM attempts a
             JOIN exam_sessions es ON a.session_id = es.session_id
             JOIN exams e ON es.exam_id = e.exam_id
-            WHERE a.attempt_id = ? AND a.status = 'IN_PROGRESS'
+            WHERE a.attempt_id = ?
+            AND a.user_id = ?
+            AND a.status = 'IN_PROGRESS'
         """;
 
         try (Connection conn = getActiveConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setInt(1, attemptId);
+            ps.setInt(2, userId);
+
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     TakeExamDetailDTO dto = new TakeExamDetailDTO();
+
                     dto.setAttemptId(rs.getInt("attempt_id"));
                     dto.setExamId(rs.getInt("exam_id"));
                     dto.setExamTitle(rs.getString("exam_title"));
                     dto.setSessionName(rs.getString("session_name"));
                     dto.setDurationMinutes(rs.getInt("duration_minutes"));
-                    dto.setQuestions(loadExamQuestions(dto.getExamId(), conn));
+
+                    dto.setQuestions(
+                        loadExamQuestions(dto.getExamId(), conn)
+                    );
+
                     return dto;
                 }
             }
         }
+
         return null;
     }
 
     // 5. Lưu toàn bộ bài nộp của học sinh (Sử dụng Transaction an toàn)
-    public void submitAttemptAnswers(int attemptId, Map<String, String[]> parameterMap) throws SQLException {
+    public void submitAttemptAnswers(
+            int attemptId,
+            int userId,
+            Map<String, String[]> parameterMap
+    ) throws SQLException {
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
             try {
+                // Xác minh lượt thi thuộc học sinh hiện tại
+                // và vẫn đang trong trạng thái làm bài.
+                String ownershipSql = """
+                    SELECT attempt_id
+                    FROM attempts
+                    WHERE attempt_id = ?
+                    AND user_id = ?
+                    AND status = 'IN_PROGRESS'
+                    FOR UPDATE
+                """;
+
+                try (PreparedStatement psOwner =
+                            conn.prepareStatement(ownershipSql)) {
+
+                    psOwner.setInt(1, attemptId);
+                    psOwner.setInt(2, userId);
+
+                    try (ResultSet rsOwner = psOwner.executeQuery()) {
+                        if (!rsOwner.next()) {
+                            throw new SQLException(
+                                "Lượt thi không hợp lệ hoặc không thuộc tài khoản hiện tại."
+                            );
+                        }
+                    }
+                }
                 // Lấy danh sách câu hỏi theo attempt
                 String qListSql = """
                     SELECT q.question_id, q.question_type 
@@ -405,10 +490,22 @@ public class AttemptDAO {
                 }
 
                 // 5.4 Cập nhật trạng thái bài thi sang SUBMITTED
-                String updateAttSql = "UPDATE attempts SET submitted_at = NOW(), status = 'SUBMITTED' WHERE attempt_id = ?";
+                String updateAttSql = """
+                    UPDATE attempts
+                    SET submitted_at = NOW(),
+                        status = 'SUBMITTED'
+                    WHERE attempt_id = ?
+                    AND user_id = ?
+                    AND status = 'IN_PROGRESS'
+                """;
+
                 try (PreparedStatement psUp = conn.prepareStatement(updateAttSql)) {
                     psUp.setInt(1, attemptId);
-                    psUp.executeUpdate();
+                    psUp.setInt(2, userId);
+
+                    if (psUp.executeUpdate() != 1) {
+                        throw new SQLException("Không thể cập nhật trạng thái lượt thi.");
+                    }
                 }
 
                 conn.commit();
@@ -416,6 +513,66 @@ public class AttemptDAO {
                 conn.rollback();
                 throw ex;
             }
+        }
+    }
+
+    public ExamWaitingDTO getExamWaitingInfo(int attemptId, int userId)
+        throws SQLException {
+
+        String sql = """
+            SELECT a.attempt_id,
+                es.session_name,
+                e.exam_title,
+                e.duration_minutes
+            FROM attempts a
+            JOIN exam_sessions es ON a.session_id = es.session_id
+            JOIN exams e ON es.exam_id = e.exam_id
+            WHERE a.attempt_id = ?
+            AND a.user_id = ?
+            AND a.status = 'IN_PROGRESS'
+        """;
+
+        try (Connection conn = getActiveConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, attemptId);
+            ps.setInt(2, userId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    ExamWaitingDTO dto = new ExamWaitingDTO();
+
+                    dto.setAttemptId(rs.getInt("attempt_id"));
+                    dto.setSessionName(rs.getString("session_name"));
+                    dto.setExamTitle(rs.getString("exam_title"));
+                    dto.setDurationMinutes(rs.getInt("duration_minutes"));
+
+                    return dto;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public boolean startExam(int attemptId, int userId)
+        throws SQLException {
+
+        String sql = """
+            UPDATE attempts
+            SET started_at = NOW()
+            WHERE attempt_id = ?
+            AND user_id = ?
+            AND status = 'IN_PROGRESS'
+        """;
+
+        try (Connection conn = getActiveConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, attemptId);
+            ps.setInt(2, userId);
+
+            return ps.executeUpdate() > 0;
         }
     }
 }
