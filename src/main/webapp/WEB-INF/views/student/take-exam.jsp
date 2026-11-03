@@ -18,6 +18,42 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/exam-security.css?v=1">
 </head>
 <body>
+<div id="fullscreenOverlay"
+    style="
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: rgba(15, 23, 42, 0.96);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-align: center;
+    ">
+
+<div>
+    <h2>Chuẩn bị vào làm bài</h2>
+
+    <p>
+        Vui lòng chuyển sang chế độ toàn màn hình
+        để bắt đầu làm bài thi.
+    </p>
+
+    <button type="button"
+            id="enterFullscreenBtn"
+            style="
+                padding: 14px 28px;
+                border: none;
+                border-radius: 8px;
+                background: #2563eb;
+                color: white;
+                font-size: 16px;
+                cursor: pointer;
+            ">
+        Tiếp tục vào bài thi
+    </button>
+</div>
+</div>
 
 <header class="exam-topbar">
      <a href="${pageContext.request.contextPath}/student/dashboard"

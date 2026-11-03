@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    let examStarted = true;
+    let examStarted = false;
 
     let violationCount = 0;
     let lastViolationTime = 0;
@@ -29,6 +29,47 @@ document.addEventListener("DOMContentLoaded", function () {
 
         console.warn("Vi phạm thi:", message);
     }
+
+    function startExamMonitoring() {
+        if (!document.fullscreenElement) {
+            return false;
+        }
+
+        examStarted = true;
+        console.log("Đã bắt đầu giám sát bài thi.");
+
+        return true;
+    }
+
+    const fullscreenOverlay =
+        document.getElementById("fullscreenOverlay");
+
+    const enterFullscreenBtn =
+        document.getElementById("enterFullscreenBtn");
+
+    enterFullscreenBtn.addEventListener("click", async function () {
+
+        try {
+            if (!document.fullscreenElement) {
+                await document.documentElement.requestFullscreen();
+            }
+
+            if (document.fullscreenElement) {
+                startExamMonitoring();
+
+                fullscreenOverlay.style.display = "none";
+            }
+
+        } catch (error) {
+            console.error("Fullscreen error:", error);
+
+            alert(
+                "Không thể bật toàn màn hình. " +
+                "Vui lòng thử lại."
+            );
+        }
+
+    });
 
 
     // ==========================================
@@ -197,7 +238,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.addEventListener("fullscreenchange", function () {
 
-        if (examStarted && !document.fullscreenElement) {
+        if (document.fullscreenElement) {
+            startExamMonitoring();
+            return;
+        }
+
+        if (examStarted) {
             recordViolation("Bạn đã thoát chế độ toàn màn hình!");
         }
 
