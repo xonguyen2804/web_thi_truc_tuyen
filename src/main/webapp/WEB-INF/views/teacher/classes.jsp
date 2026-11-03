@@ -89,12 +89,6 @@
 
         <!-- Tiêu đề -->
         <header class="page-header classes-header">
-            <a href="${pageContext.request.contextPath}/teacher/groups?classId=<%= c.classId %>"
-                class="btn btn-primary"
-                style="text-decoration:none; font-size:13px; padding:8px 12px;">
-                    Quản lý nhóm
-            </a>
-
             <div>
                 <div class="page-eyebrow">QUẢN LÝ ĐỐI TƯỢNG HỌC TẬP</div>
 
@@ -105,7 +99,6 @@
                     trong việc phân công và quản lý các đợt thi.
                 </p>
             </div>
-
             <div class="classes-header-icon">🏫</div>
         </header>
 
@@ -321,6 +314,12 @@
                                 class="btn btn-primary"
                                 style="text-decoration:none; font-size:13px; padding:8px 12px">
                                     👥 Quản lý thành viên
+                                </a>
+                                <br>
+                                <a href="${pageContext.request.contextPath}/teacher/groups?classId=<%= c.classId %>"
+                                    class="btn btn-success"
+                                    style="text-decoration:none; font-size:13px; padding:8px 12px">
+                                        👥 Quản lý nhóm
                                 </a>
 
                             </div>

@@ -56,7 +56,7 @@
                             <path d="M5 21v-2a7 7 0 0 1 14 0v2"/>
                         </svg>
                         <input class="form-input" id="username" name="username"
-                               type="text" placeholder="Nhập username hoặc mã học sinh..."
+                               type="text" placeholder="Nhập username"
                                autocomplete="username" autocapitalize="none"
                                spellcheck="false" required autofocus>
                     </div>

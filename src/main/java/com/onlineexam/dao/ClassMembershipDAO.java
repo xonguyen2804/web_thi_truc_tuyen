@@ -85,19 +85,30 @@ public class ClassMembershipDAO {
     // Kết quả: ADDED, NOT_FOUND, NOT_STUDENT,
     // INACTIVE, ALREADY_MEMBER
     public String addStudent(int classId, String username)
-            throws SQLException {
+        throws SQLException {
 
         String findSql = """
             SELECT u.user_id, u.status,
-                   CASE WHEN EXISTS (
-                       SELECT 1
-                       FROM user_roles ur
-                       JOIN roles r ON r.role_id = ur.role_id
-                       WHERE ur.user_id = u.user_id
-                         AND r.role_name = 'STUDENT'
-                   ) THEN 1 ELSE 0 END AS is_student
+                CASE WHEN EXISTS (
+                    SELECT 1
+                    FROM user_roles ur
+                    JOIN roles r ON r.role_id = ur.role_id
+                    WHERE ur.user_id = u.user_id
+                        AND r.role_name = 'STUDENT'
+                ) THEN 1 ELSE 0 END AS is_student
             FROM users u
             WHERE u.username = ?
+            """;
+
+        String existsSql = """
+            SELECT 1
+            FROM Class_Memberships
+            WHERE class_id = ? AND user_id = ?
+            """;
+
+        String insertSql = """
+            INSERT INTO Class_Memberships (class_id, user_id)
+            VALUES (?, ?)
             """;
 
         try (Connection conn = DBConnection.getConnection()) {
@@ -106,15 +117,11 @@ public class ClassMembershipDAO {
             String status;
             boolean isStudent;
 
-            try (PreparedStatement ps =
-                         conn.prepareStatement(findSql)) {
-
+            try (PreparedStatement ps = conn.prepareStatement(findSql)) {
                 ps.setString(1, username);
 
                 try (ResultSet rs = ps.executeQuery()) {
-                    if (!rs.next()) {
-                        return "NOT_FOUND";
-                    }
+                    if (!rs.next()) return "NOT_FOUND";
 
                     userId = rs.getInt("user_id");
                     status = rs.getString("status");
@@ -122,31 +129,26 @@ public class ClassMembershipDAO {
                 }
             }
 
-            if (!isStudent) {
-                return "NOT_STUDENT";
-            }
+            if (!isStudent) return "NOT_STUDENT";
 
             if (!"ACTIVE".equalsIgnoreCase(status)) {
                 return "INACTIVE";
             }
 
-            if (exists(classId, userId)) {
-                return "ALREADY_MEMBER";
-            }
-
-            String insertSql = """
-                INSERT INTO Class_Memberships (class_id, user_id)
-                VALUES (?, ?)
-                """;
-
-            try (PreparedStatement ps =
-                         conn.prepareStatement(insertSql)) {
-
+            try (PreparedStatement ps = conn.prepareStatement(existsSql)) {
                 ps.setInt(1, classId);
                 ps.setInt(2, userId);
 
-                return ps.executeUpdate() > 0
-                        ? "ADDED" : "ERROR";
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) return "ALREADY_MEMBER";
+                }
+            }
+
+            try (PreparedStatement ps = conn.prepareStatement(insertSql)) {
+                ps.setInt(1, classId);
+                ps.setInt(2, userId);
+
+                return ps.executeUpdate() > 0 ? "ADDED" : "ERROR";
             }
         }
     }
