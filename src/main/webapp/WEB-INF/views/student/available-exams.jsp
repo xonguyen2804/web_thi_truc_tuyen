@@ -160,7 +160,9 @@
                 Vui lòng nhập mật khẩu phòng thi do giáo viên cung cấp để bắt đầu làm bài.
             </p>
         
-        <form action="${pageContext.request.contextPath}/student/check-pass" method="POST">
+        <form id="enterExamForm"
+            action="${pageContext.request.contextPath}/student/check-pass"
+            method="POST">
             <input type="hidden" name="sessionId" id="modalSessionId">
             
             <div id="passwordFieldGroup" class="available-password-group">
@@ -183,7 +185,7 @@
                     </button>
 
                     <button type="submit" class="btn btn-primary available-confirm-btn">
-                        Xác nhận & Bắt đầu
+                        Vào làm bài
                     </button>
                 </div>
             </div>
@@ -239,6 +241,45 @@
         if (event.key === 'Escape') {
             closePassModal();
         }
+    });
+
+    const enterExamForm = document.getElementById("enterExamForm");
+
+    enterExamForm.addEventListener("submit", async function (event) {
+
+        event.preventDefault();
+
+        const form = this;
+
+        const submitBtn = form.querySelector(
+            'button[type="submit"]'
+        );
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "ĐANG VÀO THI...";
+
+        try {
+
+            // Yêu cầu fullscreen ngay từ thao tác nhấn của người dùng
+            if (!document.fullscreenElement) {
+                await document.documentElement.requestFullscreen();
+            }
+
+        } catch (error) {
+
+            alert(
+                "Không thể bật chế độ toàn màn hình. " +
+                "Vui lòng kiểm tra quyền fullscreen của trình duyệt và thử lại."
+            );
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Vào làm bài";
+
+            return;
+        }
+
+        // Gửi form sau khi fullscreen thành công
+        HTMLFormElement.prototype.submit.call(form);
     });
 </script>
 </body>

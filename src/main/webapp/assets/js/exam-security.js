@@ -1,42 +1,9 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    const startExamBtn = document.getElementById("startExamBtn");
+    let examStarted = true;
 
-    let examStarted = false;
     let violationCount = 0;
     let lastViolationTime = 0;
-
-    // ==========================================
-    // 1. BẮT ĐẦU THI VÀ BẬT FULLSCREEN
-    // ==========================================
-
-    startExamBtn.addEventListener("click", async function () {
-
-        try {
-            await document.documentElement.requestFullscreen();
-
-            examStarted = true;
-
-            startExamBtn.disabled = true;
-            startExamBtn.textContent = "ĐANG TRONG PHÒNG THI";
-            startExamBtn.classList.add("exam-active");
-
-            // Khóa một số phím nếu trình duyệt hỗ trợ
-            if (navigator.keyboard && navigator.keyboard.lock) {
-                try {
-                    await navigator.keyboard.lock([
-                        "Tab",
-                        "Escape"
-                    ]);
-                } catch (error) {
-                    console.log("Không thể khóa bàn phím:", error);
-                }
-            }
-
-        } catch (error) {
-            alert("Không thể bật chế độ toàn màn hình. Vui lòng thử lại!");
-        }
-    });
 
 
     // ==========================================

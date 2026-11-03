@@ -31,10 +31,6 @@
         <span class="exam-attempt-id">Mã phiên thi: #<%= attemptId %></span>
     </div>
 
-    <button type="button" id="startExamBtn" class="exam-start-btn">
-        BẮT ĐẦU THI
-    </button>
-
     <div class="exam-timer">
         <span class="exam-timer-icon">⏱</span>
         <div>
@@ -47,7 +43,9 @@
 <form id="examForm" action="${pageContext.request.contextPath}/student/submit-exam" method="POST">
     <input type="hidden" name="action" value="submit">
     <input type="hidden" name="attemptId" value="<%= attemptId %>">
-    <input type="hidden" id="durationMinutesInput" value="<%= durationMinutes %>">
+    <input type="hidden"
+            id="remainingSecondsInput"
+            value="<%= request.getAttribute("remainingSeconds") %>">
 
     <div class="layout-exam student-take-exam">
         <div class="questions-col">
@@ -148,34 +146,74 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const inputMinutes = document.getElementById('durationMinutesInput');
-        let minutes = inputMinutes && inputMinutes.value ? parseInt(inputMinutes.value, 10) : 45;
-        if (isNaN(minutes) || minutes <= 0) minutes = 45;
 
-        let totalSeconds = minutes * 60;
-        const timerDisplay = document.getElementById('countdown');
+        const remainingInput =
+            document.getElementById("remainingSecondsInput");
+
+        const timerDisplay =
+            document.getElementById("countdown");
+
+        const examForm =
+            document.getElementById("examForm");
+
+        if (!remainingInput || !timerDisplay || !examForm) {
+            return;
+        }
+
+        let remainingSeconds = parseInt(
+            remainingInput.value,
+            10
+        );
+
+        if (isNaN(remainingSeconds) || remainingSeconds < 0) {
+            remainingSeconds = 0;
+        }
+
+        // Tính deadline từ số giây server trả về
+        const deadline = Date.now() + remainingSeconds * 1000;
 
         function renderTimer() {
-            let m = Math.floor(totalSeconds / 60);
-            let s = totalSeconds % 60;
-            timerDisplay.innerText = 
-                (m < 10 ? "0" : "") + m + ":" + 
-                (s < 10 ? "0" : "") + s;
+
+            const minutes = Math.floor(remainingSeconds / 60);
+            const seconds = remainingSeconds % 60;
+
+            timerDisplay.textContent =
+                String(minutes).padStart(2, "0") + ":" +
+                String(seconds).padStart(2, "0");
+
+            if (remainingSeconds <= 300) {
+                timerDisplay.classList.add("timer-warning");
+            }
+        }
+
+        function updateTimer() {
+
+            remainingSeconds = Math.max(
+                0,
+                Math.ceil((deadline - Date.now()) / 1000)
+            );
+
+            renderTimer();
+
+            if (remainingSeconds <= 0) {
+
+                clearInterval(timerInterval);
+
+                alert(
+                    "Đã hết thời gian làm bài! " +
+                    "Hệ thống sẽ tự động nộp bài."
+                );
+
+                examForm.submit();
+            }
         }
 
         renderTimer();
 
-        const timerInterval = setInterval(function () {
-            totalSeconds--;
-            if (totalSeconds < 0) {
-                clearInterval(timerInterval);
-                timerDisplay.innerText = "00:00";
-                alert("Đã hết thời gian làm bài! Hệ thống tự động nộp bài thi của bạn.");
-                document.getElementById('examForm').submit();
-                return;
-            }
-            renderTimer();
-        }, 1000);
+        const timerInterval = setInterval(
+            updateTimer,
+            250
+        );
     });
 
     function confirmSubmit() {

@@ -82,10 +82,19 @@ public class AttemptDAO {
     }
 
     public static class ExamWaitingDTO {
+
         private int attemptId;
+        private int sessionId;
+
         private String examTitle;
         private String sessionName;
+
         private int durationMinutes;
+
+        private Timestamp startedAt;
+        private String status;
+
+        private long remainingSeconds;
 
         public int getAttemptId() {
             return attemptId;
@@ -93,6 +102,14 @@ public class AttemptDAO {
 
         public void setAttemptId(int attemptId) {
             this.attemptId = attemptId;
+        }
+
+        public int getSessionId() {
+            return sessionId;
+        }
+
+        public void setSessionId(int sessionId) {
+            this.sessionId = sessionId;
         }
 
         public String getExamTitle() {
@@ -117,6 +134,30 @@ public class AttemptDAO {
 
         public void setDurationMinutes(int durationMinutes) {
             this.durationMinutes = durationMinutes;
+        }
+
+        public Timestamp getStartedAt() {
+            return startedAt;
+        }
+
+        public void setStartedAt(Timestamp startedAt) {
+            this.startedAt = startedAt;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public void setStatus(String status) {
+            this.status = status;
+        }
+
+        public long getRemainingSeconds() {
+            return remainingSeconds;
+        }
+
+        public void setRemainingSeconds(long remainingSeconds) {
+            this.remainingSeconds = remainingSeconds;
         }
     }
 
@@ -244,7 +285,7 @@ public class AttemptDAO {
             }
         }
 
-        String insSql = "INSERT INTO attempts (session_id, user_id, attempt_number, started_at, status) VALUES (?, ?, ?, NOW(), 'IN_PROGRESS')";
+        String insSql = "INSERT INTO attempts(session_id, user_id, attempt_number, started_at, status)VALUES (?, ?, ?, NULL, 'IN_PROGRESS')";
         try (Connection conn = getActiveConnection();
              PreparedStatement ps = conn.prepareStatement(insSql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, sessionId);
@@ -516,17 +557,42 @@ public class AttemptDAO {
         }
     }
 
-    public ExamWaitingDTO getExamWaitingInfo(int attemptId, int userId)
-        throws SQLException {
+    public ExamWaitingDTO getExamWaitingInfo(
+        int attemptId,
+        int userId
+    ) throws SQLException {
 
         String sql = """
-            SELECT a.attempt_id,
+            SELECT
+                a.attempt_id,
+                a.session_id,
+                a.started_at,
+                a.status,
                 es.session_name,
                 e.exam_title,
-                e.duration_minutes
+                e.duration_minutes,
+
+                CASE
+                    WHEN a.started_at IS NULL THEN 0
+                    ELSE GREATEST(
+                        0,
+                        TIMESTAMPDIFF(
+                            SECOND,
+                            NOW(),
+                            DATE_ADD(
+                                a.started_at,
+                                INTERVAL e.duration_minutes MINUTE
+                            )
+                        )
+                    )
+                END AS remaining_seconds
+
             FROM attempts a
-            JOIN exam_sessions es ON a.session_id = es.session_id
-            JOIN exams e ON es.exam_id = e.exam_id
+            JOIN exam_sessions es
+                ON a.session_id = es.session_id
+            JOIN exams e
+                ON es.exam_id = e.exam_id
+
             WHERE a.attempt_id = ?
             AND a.user_id = ?
             AND a.status = 'IN_PROGRESS'
@@ -539,13 +605,30 @@ public class AttemptDAO {
             ps.setInt(2, userId);
 
             try (ResultSet rs = ps.executeQuery()) {
+
                 if (rs.next()) {
+
                     ExamWaitingDTO dto = new ExamWaitingDTO();
 
                     dto.setAttemptId(rs.getInt("attempt_id"));
+                    dto.setSessionId(rs.getInt("session_id"));
+
                     dto.setSessionName(rs.getString("session_name"));
                     dto.setExamTitle(rs.getString("exam_title"));
-                    dto.setDurationMinutes(rs.getInt("duration_minutes"));
+
+                    dto.setDurationMinutes(
+                        rs.getInt("duration_minutes")
+                    );
+
+                    dto.setStartedAt(
+                        rs.getTimestamp("started_at")
+                    );
+
+                    dto.setStatus(rs.getString("status"));
+
+                    dto.setRemainingSeconds(
+                        rs.getLong("remaining_seconds")
+                    );
 
                     return dto;
                 }
@@ -555,8 +638,10 @@ public class AttemptDAO {
         return null;
     }
 
-    public boolean startExam(int attemptId, int userId)
-        throws SQLException {
+    public boolean startExam(
+        int attemptId,
+        int userId
+    ) throws SQLException {
 
         String sql = """
             UPDATE attempts
@@ -564,6 +649,7 @@ public class AttemptDAO {
             WHERE attempt_id = ?
             AND user_id = ?
             AND status = 'IN_PROGRESS'
+            AND started_at IS NULL
         """;
 
         try (Connection conn = getActiveConnection();
@@ -572,7 +658,18 @@ public class AttemptDAO {
             ps.setInt(1, attemptId);
             ps.setInt(2, userId);
 
-            return ps.executeUpdate() > 0;
+            int affected = ps.executeUpdate();
+
+            if (affected > 0) {
+                return true;
+            }
         }
+
+        // Nếu chưa cập nhật được, kiểm tra xem Attempt
+        // đã được bắt đầu trước đó hay chưa.
+        ExamWaitingDTO current =
+            getExamWaitingInfo(attemptId, userId);
+
+        return current != null && current.getStartedAt() != null;
     }
 }

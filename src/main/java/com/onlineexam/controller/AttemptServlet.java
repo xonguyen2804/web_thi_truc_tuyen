@@ -207,6 +207,9 @@
 
 package com.onlineexam.controller;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.sql.Timestamp;
 import com.onlineexam.dao.AttemptDAO;
 import com.onlineexam.dao.ExamSessionDAO;
 import com.onlineexam.model.ExamSession;
@@ -222,9 +225,6 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @WebServlet({
@@ -303,12 +303,7 @@ public class AttemptServlet extends HttpServlet {
         String path = request.getServletPath();
 
         if ("/student/check-pass".equals(path)) {
-            // Vào phòng thi: chưa kiểm tra mật khẩu
-            handleEnterExam(request, response, user);
-
-        } else if ("/student/start-exam".equals(path)) {
-            // Bắt đầu thi: kiểm tra mật khẩu
-            handleStartExam(request, response, user);
+            handleVerifyPassAndStart(request, response, user);
 
         } else if ("/student/submit-exam".equals(path)) {
             handleSubmitExam(request, response, user);
@@ -387,73 +382,15 @@ public class AttemptServlet extends HttpServlet {
     }
 
     // =========================================================
-    // 2. ENTER EXAM ROOM
-    // Chưa kiểm tra mật khẩu, chưa bắt đầu tính giờ
-    // =========================================================
-
-    private void handleEnterExam(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            User user
-    ) throws IOException {
-
-        Integer sessionId = parsePositiveInt(
-            request.getParameter("sessionId")
-        );
-
-        if (sessionId == null) {
-            response.sendRedirect(
-                request.getContextPath() + "/student/exams"
-            );
-            return;
-        }
-
-        try {
-
-            ExamSession examSession = sessionDAO.findById(sessionId);
-
-            if (examSession == null
-                    || !"OPEN".equalsIgnoreCase(examSession.getStatus())) {
-
-                response.sendRedirect(
-                    request.getContextPath()
-                    + "/student/exams?error=Ca+thi+chua+duoc+mo"
-                );
-                return;
-            }
-
-            // Tạo hoặc lấy Attempt của chính học sinh này
-            int attemptId = attemptDAO.getOrCreateActiveAttempt(
-                sessionId,
-                user.getUserId()
-            );
-
-            response.sendRedirect(
-                request.getContextPath()
-                + "/student/take-exam?attemptId=" + attemptId
-            );
-
-        } catch (SQLException e) {
-
-            e.printStackTrace();
-
-            response.sendRedirect(
-                request.getContextPath()
-                + "/student/exams?error=Khong+the+vao+phong+thi"
-            );
-        }
-    }
-
-    // =========================================================
     // 3. TAKE EXAM PAGE
     // Nếu chưa bắt đầu: hiển thị màn hình chờ
     // Nếu đã bắt đầu: khôi phục bài thi
     // =========================================================
 
     private void handleTakeExamPage(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            User user
+        HttpServletRequest request,
+        HttpServletResponse response,
+        User user
     ) throws ServletException, IOException {
 
         Integer attemptId = parsePositiveInt(
@@ -468,13 +405,7 @@ public class AttemptServlet extends HttpServlet {
         }
 
         try {
-
-            /*
-             * Quan trọng:
-             * Chỉ lấy thông tin Attempt nếu nó thuộc về user hiện tại.
-             *
-             * Không được truy vấn chỉ bằng attemptId.
-             */
+            // Kiểm tra Attempt thuộc học sinh hiện tại
             AttemptDAO.ExamWaitingDTO examInfo =
                 attemptDAO.getExamWaitingInfo(
                     attemptId,
@@ -482,7 +413,6 @@ public class AttemptServlet extends HttpServlet {
                 );
 
             if (examInfo == null) {
-
                 response.sendError(
                     HttpServletResponse.SC_FORBIDDEN,
                     "Bạn không có quyền truy cập lượt thi này."
@@ -490,53 +420,25 @@ public class AttemptServlet extends HttpServlet {
                 return;
             }
 
-            // Kiểm tra trạng thái lượt thi
-            if (!"IN_PROGRESS".equalsIgnoreCase(examInfo.getStatus())) {
-
+            // Chưa bắt đầu thì không cho truy cập trực tiếp đề thi
+            if (examInfo.getStartedAt() == null) {
                 response.sendRedirect(
                     request.getContextPath() + "/student/exams"
                 );
                 return;
             }
 
-            Timestamp startedAt = examInfo.getStartedAt();
-
-            // Trường hợp 1: Chưa bắt đầu thi
-            if (startedAt == null) {
-
-                request.setAttribute("examInfo", examInfo);
-                request.setAttribute("attemptId", attemptId);
-
-                request.getRequestDispatcher(
-                    "/WEB-INF/views/student/take-exam.jsp"
-                ).forward(request, response);
-
-                return;
-            }
-
-            // Trường hợp 2: Đã bắt đầu thi -> khôi phục bài làm
-            long remainingSeconds = calculateRemainingSeconds(
-                startedAt,
-                examInfo.getDurationMinutes()
-            );
+            long remainingSeconds = examInfo.getRemainingSeconds();
 
             if (remainingSeconds <= 0) {
-
-                // Không được tiếp tục nếu đã hết giờ.
-                // Phần cập nhật trạng thái hết hạn cần được xử lý ở DAO.
-                attemptDAO.markAttemptExpired(
-                    attemptId,
-                    user.getUserId()
+                response.sendError(
+                    HttpServletResponse.SC_GONE,
+                    "Bài thi đã hết thời gian."
                 );
-
-                response.sendRedirect(
-                    request.getContextPath()
-                    + "/student/exams?error=Da+het+thoi+gian+lam+bai"
-                );
-
                 return;
             }
 
+            // Lấy câu hỏi, tiếp tục xác minh quyền sở hữu
             AttemptDAO.TakeExamDetailDTO detail =
                 attemptDAO.getTakeExamDetail(
                     attemptId,
@@ -544,10 +446,8 @@ public class AttemptServlet extends HttpServlet {
                 );
 
             if (detail == null) {
-
                 response.sendError(
-                    HttpServletResponse.SC_FORBIDDEN,
-                    "Không thể truy cập bài thi này."
+                    HttpServletResponse.SC_FORBIDDEN
                 );
                 return;
             }
@@ -557,50 +457,60 @@ public class AttemptServlet extends HttpServlet {
             request.setAttribute("sessionName", detail.getSessionName());
             request.setAttribute("durationMinutes", detail.getDurationMinutes());
             request.setAttribute("questions", detail.getQuestions());
-
-            // Thời gian còn lại tính từ started_at trong database
             request.setAttribute("remainingSeconds", remainingSeconds);
 
             request.getRequestDispatcher(
-                "/WEB-INF/views/student/exam-questions.jsp"
+                "/WEB-INF/views/student/take-exam.jsp"
             ).forward(request, response);
 
         } catch (SQLException e) {
-
             e.printStackTrace();
 
             response.sendError(
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                "Lỗi tải thông tin bài thi."
+                "Lỗi tải bài thi."
             );
         }
     }
 
-    // =========================================================
-    // 4. START EXAM
-    // Kiểm tra mật khẩu, bắt đầu tính giờ và tải câu hỏi
-    // =========================================================
-
-    private void handleStartExam(
+    // Xác thực mật khẩu và bắt đầu thi ngay lập tức
+    private void handleVerifyPassAndStart(
             HttpServletRequest request,
             HttpServletResponse response,
             User user
     ) throws ServletException, IOException {
 
-        Integer attemptId = parsePositiveInt(
-            request.getParameter("attemptId")
+        Integer sessionId = parsePositiveInt(
+            request.getParameter("sessionId")
         );
 
         String inputPassword = request.getParameter("sessionPassword");
 
-        if (attemptId == null) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        if (sessionId == null) {
+            response.sendRedirect(
+                request.getContextPath() + "/student/exams"
+            );
             return;
         }
 
         try {
+            // 1. Lấy thông tin ca thi
+            ExamSession examSession = sessionDAO.findById(sessionId);
 
-            // Bước 1: Kiểm tra quyền sở hữu Attempt
+            if (examSession == null) {
+                response.sendRedirect(
+                    request.getContextPath() + "/student/exams?error=Ca+thi+khong+ton+tai"
+                );
+                return;
+            }
+
+            // 2. Tạo hoặc lấy Attempt của học sinh
+            int attemptId = attemptDAO.getOrCreateActiveAttempt(
+                sessionId,
+                user.getUserId()
+            );
+
+            // 3. Kiểm tra Attempt có thuộc học sinh hiện tại không
             AttemptDAO.ExamWaitingDTO examInfo =
                 attemptDAO.getExamWaitingInfo(
                     attemptId,
@@ -608,7 +518,6 @@ public class AttemptServlet extends HttpServlet {
                 );
 
             if (examInfo == null) {
-
                 response.sendError(
                     HttpServletResponse.SC_FORBIDDEN,
                     "Bạn không có quyền truy cập lượt thi này."
@@ -616,63 +525,55 @@ public class AttemptServlet extends HttpServlet {
                 return;
             }
 
-            if (!"IN_PROGRESS".equalsIgnoreCase(examInfo.getStatus())) {
-                response.sendError(
-                    HttpServletResponse.SC_FORBIDDEN,
-                    "Lượt thi không còn hợp lệ."
-                );
-                return;
-            }
-
             /*
-             * Bước 2:
-             * Nếu đã bắt đầu trước đó thì không hỏi lại mật khẩu
-             * và tuyệt đối không cập nhật lại started_at.
-             */
+            * 4. Chỉ xác thực mật khẩu và ghi started_at
+            * nếu đây là lượt thi chưa bắt đầu.
+            *
+            * Nếu đã bắt đầu trước đó:
+            * - Không yêu cầu nhập lại mật khẩu.
+            * - Không cập nhật lại started_at.
+            */
             if (examInfo.getStartedAt() == null) {
 
-                ExamSession examSession =
-                    sessionDAO.findById(examInfo.getSessionId());
-
-                if (examSession == null
-                        || !"OPEN".equalsIgnoreCase(examSession.getStatus())) {
-
-                    response.sendError(
-                        HttpServletResponse.SC_FORBIDDEN,
-                        "Ca thi đã đóng."
+                if (!"OPEN".equalsIgnoreCase(examSession.getStatus())) {
+                    response.sendRedirect(
+                        request.getContextPath()
+                        + "/student/exams?error=Ca+thi+chua+duoc+mo"
                     );
                     return;
                 }
 
-                // Kiểm tra mật khẩu phòng thi
                 String correctPassword = examSession.getSessionPassword();
 
-                if (correctPassword != null
-                        && !correctPassword.isBlank()) {
+                if (correctPassword != null && !correctPassword.isBlank()) {
 
                     if (inputPassword == null
                             || !correctPassword.trim().equals(inputPassword.trim())) {
 
-                        response.sendError(
-                            HttpServletResponse.SC_UNAUTHORIZED,
-                            "Mật khẩu phòng thi không chính xác."
+                        response.sendRedirect(
+                            request.getContextPath()
+                            + "/student/exams?error=Mat+khau+phong+thi+khong+dung"
                         );
                         return;
                     }
                 }
 
-                /*
-                 * Bước 3:
-                 * Chỉ cập nhật started_at nếu đang NULL.
-                 * DAO phải kiểm tra cả attemptId và userId.
-                 */
-                attemptDAO.startExam(
+                // Ghi nhận thời điểm bắt đầu đúng một lần
+                boolean started = attemptDAO.startExam(
                     attemptId,
                     user.getUserId()
                 );
+
+                if (!started) {
+                    response.sendError(
+                        HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                        "Không thể bắt đầu bài thi."
+                    );
+                    return;
+                }
             }
 
-            // Bước 4: Đọc lại thông tin sau khi bắt đầu
+            // 5. Đọc lại thời gian còn lại sau khi bắt đầu
             AttemptDAO.ExamWaitingDTO updatedInfo =
                 attemptDAO.getExamWaitingInfo(
                     attemptId,
@@ -680,26 +581,16 @@ public class AttemptServlet extends HttpServlet {
                 );
 
             if (updatedInfo == null || updatedInfo.getStartedAt() == null) {
-
                 response.sendError(
                     HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Không thể ghi nhận thời điểm bắt đầu thi."
+                    "Không thể xác định thời điểm bắt đầu thi."
                 );
                 return;
             }
 
-            long remainingSeconds = calculateRemainingSeconds(
-                updatedInfo.getStartedAt(),
-                updatedInfo.getDurationMinutes()
-            );
+            long remainingSeconds = updatedInfo.getRemainingSeconds();
 
             if (remainingSeconds <= 0) {
-
-                attemptDAO.markAttemptExpired(
-                    attemptId,
-                    user.getUserId()
-                );
-
                 response.sendError(
                     HttpServletResponse.SC_GONE,
                     "Bài thi đã hết thời gian."
@@ -707,7 +598,7 @@ public class AttemptServlet extends HttpServlet {
                 return;
             }
 
-            // Bước 5: Tải câu hỏi sau khi xác thực thành công
+            // 6. Tải câu hỏi
             AttemptDAO.TakeExamDetailDTO detail =
                 attemptDAO.getTakeExamDetail(
                     attemptId,
@@ -715,30 +606,32 @@ public class AttemptServlet extends HttpServlet {
                 );
 
             if (detail == null) {
-
                 response.sendError(
                     HttpServletResponse.SC_FORBIDDEN,
-                    "Bạn không có quyền truy cập bài thi này."
+                    "Không thể truy cập bài thi này."
                 );
                 return;
             }
 
+            // 7. Đưa dữ liệu sang JSP
             request.setAttribute("attemptId", detail.getAttemptId());
+            request.setAttribute("examTitle", detail.getExamTitle());
+            request.setAttribute("sessionName", detail.getSessionName());
             request.setAttribute("durationMinutes", detail.getDurationMinutes());
             request.setAttribute("questions", detail.getQuestions());
             request.setAttribute("remainingSeconds", remainingSeconds);
 
+            // 8. Hiển thị đề thi ngay, không qua trang chờ
             request.getRequestDispatcher(
-                "/WEB-INF/views/student/exam-questions.jsp"
+                "/WEB-INF/views/student/take-exam.jsp"
             ).forward(request, response);
 
         } catch (SQLException e) {
-
             e.printStackTrace();
 
             response.sendError(
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                "Lỗi khi bắt đầu bài thi."
+                "Lỗi khi xác thực và bắt đầu bài thi."
             );
         }
     }
